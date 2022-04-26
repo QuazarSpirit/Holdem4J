@@ -22,8 +22,14 @@ class PositionHandlerTest {
 
             assertEquals(fp_count, FP_ORDER_LENGTH - i);
             assertEquals(fp_count, FP_ORDER_LENGTH - i);
-            assertEquals(p.pickFreePosition(),
-                    PositionHandler.POSITION_NAME.FREE_POSITION_ORDER[FP_ORDER_LENGTH - i++ - 1]);
+            PositionHandler.POSITION_NAME pName = p.pickFreePosition();
+
+            System.out.print(pName + " ");
+            assertEquals(pName,
+                    PositionHandler.POSITION_NAME.FREE_POSITION_ORDER[FP_ORDER_LENGTH - i - 1]);
+            assertEquals(pName,
+                    PositionHandler.POSITION_NAME.SEAT_POSITION_ORDER[i + 2]);
+            i++;
         }
     }
 

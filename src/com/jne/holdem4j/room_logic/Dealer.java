@@ -9,4 +9,5 @@ package com.jne.holdem4j.room_logic;
  * Computes pot size
  */
 public class Dealer {
+
 }
