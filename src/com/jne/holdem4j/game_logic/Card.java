@@ -1,9 +1,12 @@
 package com.jne.holdem4j.game_logic;
 
+import com.jne.business_rule_engine.Checkable;
+import com.jne.business_rule_engine.ICheckable;
+
 import java.util.*;
 
 @SuppressWarnings("ALL")
-public class Card {
+public class Card extends Checkable {
     static enum VALID_STATE {
         NONE, OK, INVALID_RANK, INVALID_COLOR, INVALID_LENGTH
     };
@@ -15,6 +18,9 @@ public class Card {
     private boolean _valid = false;
     private VALID_STATE _valid_state = VALID_STATE.NONE;
     Card(String value) {
+        super();
+
+        // Needs to be moved in CardRule
         if (value.length() != 2) {
             if (! value.equals("")) {
                 this._valid_state = VALID_STATE.INVALID_LENGTH;
@@ -42,21 +48,17 @@ public class Card {
         this._valid = true;
         this._valid_state = VALID_STATE.OK;
     }// constructor()
-
     public boolean isValid() {
         return this._valid;
     }
     public VALID_STATE getValidState() { return this._valid_state; }
-
     public String getRank() {
         return this._rank;
     }
-
     public String getColor() {
         return this._color;
     }
     public String getValue() { return this._value; }
-
     public static void main(String[] args) {
         while(true) {
             System.out.println("Type q to exit");

@@ -1,10 +1,14 @@
 package com.jne.holdem4j.game_logic;
+import com.jne.business_rule_engine.Checkable;
+import com.jne.business_rule_engine.IRule;
+
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Deck {
+public class Deck extends Checkable {
     final protected ArrayList<Card> _cards = new ArrayList<Card>();
-    Deck() {
+    public Deck() {
+        super();
         _init();
     }
     private void _init() {
