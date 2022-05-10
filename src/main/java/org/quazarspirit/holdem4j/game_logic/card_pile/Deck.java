@@ -10,8 +10,9 @@ public class Deck extends CardPile {
         super();
         init();
     }
+
     @Override
-    protected void init() {
+    public void init() {
         cards.clear();
 
         for(char color: Card.COLORS.toCharArray()) {
@@ -39,16 +40,7 @@ public class Deck extends CardPile {
 
         return shuffledDeck;
     }
-    public String asString() {
-        StringBuilder deckAsString = new StringBuilder();
-        for (Object o: cards.toArray()) {
-            Card card = (Card) o;
-            deckAsString.append(card.getValue()).append("/");
-        }
 
-        deckAsString = new StringBuilder(deckAsString.substring(0, deckAsString.length() - 1));
-        return deckAsString.toString();
-    }
     public Card pick(int index) {
         Card card = getCardAt(index);
         cards.remove(index);
@@ -58,11 +50,6 @@ public class Deck extends CardPile {
         Card card = pick(0);
         discardPile.pushCard(card);
     }
-    public void clear() {
-        cards.clear();
-    }
+
     public DiscardPile getDiscardPile() { return discardPile; }
-    public Card getCardAt(int index) {
-        return cards.get(index);
-    }
 }

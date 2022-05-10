@@ -52,9 +52,11 @@ public class Card {
     public String getRank() {
         return this._rank;
     }
+    public int getRankAsInt() { return RANKS.indexOf(this._rank); }
     public String getColor() {
         return this._color;
     }
+    public int getColorAsInt() { return COLORS.indexOf(this._color); }
     public String getValue() { return this._value; }
     public static void main(String[] args) {
         while(true) {

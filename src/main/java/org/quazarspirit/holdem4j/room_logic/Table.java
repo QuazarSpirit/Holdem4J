@@ -3,6 +3,8 @@ package org.quazarspirit.holdem4j.room_logic;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Board;
 import org.quazarspirit.holdem4j.game_logic.Game;
 import org.quazarspirit.holdem4j.game_logic.Round;
+import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
+import org.quazarspirit.holdem4j.game_logic.card_pile.NullCardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.PocketCards;
 import org.quazarspirit.holdem4j.room_logic.player_logic.IPlayer;
 import org.quazarspirit.holdem4j.room_logic.player_logic.NullPlayer;
@@ -56,6 +58,20 @@ public class Table {
         }
 
         return PositionHandler.POSITION_NAME.NONE;
+    }
+
+    public ICardPile getPocketCards(IPlayer player) {
+        final ICardPile NCP = NullCardPile.GetSingleton();
+        if (player.equals(NullPlayer.GetSingleton())) {
+            return NCP;
+        }
+
+        ICardPile cardPile = playersPocketCard.get(player);
+        if (cardPile == null) {
+            return NCP;
+        }
+
+       return cardPile;
     }
 
     int getMaxPlayerCount() {

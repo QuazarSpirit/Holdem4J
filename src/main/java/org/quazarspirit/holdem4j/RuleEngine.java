@@ -13,13 +13,8 @@ import java.util.ArrayList;
 public class RuleEngine {
     public static void main(String[] args) throws Exception {
         //create a person instance (fact)
-        Person kevin = new Person("Kevin", 17);
-        Person tom = new Person("Tom", 19);
 
         Facts facts = new Facts();
-        facts.put("person", kevin);
-        facts.put("person2", tom);
-
         MVELRuleFactory ruleFactory = new MVELRuleFactory(new YamlRuleDefinitionReader());
         String fileName = "src/main/java/org/quazarspirit/holdem4j/rule.yml";
         String fileName2 = "src/main/java/org/quazarspirit/holdem4j/rule2.yml";

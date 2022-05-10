@@ -6,13 +6,13 @@ public class PocketCards extends CardPile{
     static protected int maxSize = 2;
 
     @Override
-    protected void init() {
+    public void init() {}
 
-    }
+
 
     void fold(Deck deck) {
         DiscardPile dp = deck.getDiscardPile();
-        for (Card c:cards) {
+        for (Card c: cards) {
             cards.remove(c);
             dp.pushCard(c);
         }
