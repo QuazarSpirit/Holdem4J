@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j.game_logic.card_pile;
 
 import org.quazarspirit.holdem4j.game_logic.Card;
+import org.quazarspirit.holdem4j.game_logic.NullCard;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,7 +44,10 @@ public abstract class CardPile implements ICardPile {
     }
     @Override
     public Card getCardAt(int index) {
-        return cards.get(index);
+        if (index >= 0 && index < cards.size()) {
+            return cards.get(index);
+        }
+        return NullCard.GetSingleton();
     }
 
     /**
@@ -62,9 +66,6 @@ public abstract class CardPile implements ICardPile {
         }
     }
     public String asString(SORT_CRITERIA sortCriteria) {
-        if (sortCriteria == null) {
-            sortCriteria = SORT_CRITERIA.VALUE;
-        }
         StringBuilder cardPileAsString = new StringBuilder();
         for (Object o: cards.toArray()) {
             Card card = (Card) o;
@@ -79,8 +80,20 @@ public abstract class CardPile implements ICardPile {
             cardPileAsString.append(card_Str).append(CARD_CHAR_SEPARATOR);
         }
 
-        cardPileAsString = new StringBuilder(cardPileAsString.substring(0, cardPileAsString.length() - 1));
-        return cardPileAsString.toString();
+        // Remove last "/"
+        return cardPileAsString.toString().replaceAll(CARD_CHAR_SEPARATOR + "$", "");
+    }
+
+    /**
+     * Returns String representation of CardPile with default sort criteria as Value
+     * @return String
+     */
+    public String asString() {
+        return asString(SORT_CRITERIA.VALUE);
+    }
+
+    public String asString(SORT_CRITERIA sortCriteria, String separator) {
+        return asString(sortCriteria).replace(CardPile.CARD_CHAR_SEPARATOR, separator);
     }
 
     /**

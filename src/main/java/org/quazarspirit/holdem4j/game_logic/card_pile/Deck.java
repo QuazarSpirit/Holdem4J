@@ -4,6 +4,9 @@ import org.quazarspirit.holdem4j.game_logic.Card;
 
 import java.util.Random;
 
+/**
+ *
+ */
 public class Deck extends CardPile {
     protected DiscardPile discardPile = new DiscardPile();
     public Deck() {
@@ -11,6 +14,9 @@ public class Deck extends CardPile {
         init();
     }
 
+    /**
+     *
+     */
     @Override
     public void init() {
         cards.clear();
@@ -22,6 +28,24 @@ public class Deck extends CardPile {
             }
         }
     }
+
+    /**
+     * Overloads init default method
+     * Meant to create Deck with a subset Card. RANKS
+     * eg: Royal Poker
+     * @param cardRange subString of valid ranks (eg: A2345)
+     */
+    public void init(String cardRange) {
+        cards.clear();
+
+        for(char color: Card.COLORS.toCharArray()) {
+            for(char rank: cardRange.toCharArray()) {
+                Card c = new Card(("" + rank + color));
+                cards.add(c);
+            }
+        }
+    }
+
     public Deck shuffle() {
         Deck initialDeck = this;
         Deck shuffledDeck = new Deck();

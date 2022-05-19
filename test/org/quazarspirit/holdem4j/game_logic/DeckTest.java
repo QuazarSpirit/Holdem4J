@@ -4,13 +4,43 @@ import org.junit.jupiter.api.Test;
 import org.quazarspirit.holdem4j.game_logic.card_pile.CardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Deck;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DeckTest {
+
+    Pattern compileRegEx(String cardRange) {
+        String regEx = "^(" + cardRange + "){4}$";
+        return Pattern.compile(regEx);
+    }
     @Test
     void constructor() {
         Deck deck = new Deck();
-        assertEquals(52, deck.size());
+        assertEquals(deck.getMaxSize(), deck.size());
+    }
+
+    @Test
+    void initWithoutArgs() {
+        Pattern pattern = compileRegEx(Card.RANKS);
+
+        Deck deck = new Deck();
+        assertEquals(deck.getMaxSize(), deck.size());
+        Matcher match = pattern.matcher(deck.asString(CardPile.SORT_CRITERIA.RANK, ""));
+        assertTrue(match.matches());
+    }
+
+    @Test
+    void initWithCardRange() {
+        String cardRange = "2345A";
+        Pattern pattern = compileRegEx(cardRange);
+
+        Deck deck = new Deck();
+        deck.init(cardRange);
+        assertEquals(deck.size(), cardRange.length() * Card.COLORS.length());
+        Matcher match = pattern.matcher(deck.asString(CardPile.SORT_CRITERIA.RANK, ""));
+        assertTrue(match.matches());
     }
 
     @Test
