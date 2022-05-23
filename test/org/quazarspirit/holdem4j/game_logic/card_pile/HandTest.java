@@ -6,21 +6,6 @@ import org.quazarspirit.holdem4j.game_logic.Card;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HandTest {
-
-    @Test
-    void computeRank() {
-        Hand hand = new Hand();
-        Deck deck = new Deck(); //.shuffle();
-        for(int i = 0; i < hand.getMaxSize(); i++) {
-            hand.pushCard(deck.getCardAt(i));
-        }
-        System.out.println(hand.asString(CardPile.SORT_CRITERIA.VALUE));
-
-        hand.computeRank(hand);
-
-    }
-
-
     @Test
     void sortRank() {
         Hand hand = new Hand();

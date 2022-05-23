@@ -108,9 +108,11 @@ class RankEvaluatorTest {
 
         for(Hand hand: handList){
             Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
-            assertEquals(eval.getKey(), Hand.HAND_RANK.FLUSH);
-            hand.sort(CardPile.SORT_CRITERIA.RANK);
-            assertEquals(eval.getValue().highnessAsString(), hand.getCardAt(hand.getMaxSize() - 1).getRank());
+            if (eval.getKey() != Hand.HAND_RANK.STRAIGHT_FLUSH) {
+                assertEquals(eval.getKey(), Hand.HAND_RANK.FLUSH);
+                hand.sort(CardPile.SORT_CRITERIA.RANK);
+                assertEquals(eval.getValue().highnessAsString(), hand.getCardAt(hand.getMaxSize() - 1).getRank());
+            }
         }
     }
 
@@ -349,7 +351,7 @@ class RankEvaluatorTest {
     }
 
     @Test
-    void evaluateHighCard() {
+    void evaluateCardHigh() {
         Deck deck = new Deck();
         ArrayList<Hand> handList = new ArrayList<>();
 

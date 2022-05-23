@@ -8,8 +8,6 @@ import org.quazarspirit.holdem4j.room_logic.PositionHandler;
 import org.quazarspirit.holdem4j.room_logic.player_logic.IPlayer;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Hand extends CardPile {
     static protected int _maxSize = 5;
@@ -39,15 +37,6 @@ public class Hand extends CardPile {
     @Override
     public int getMaxSize() { return Hand._maxSize; }
 
-    // Reg ex abandoned because group names can't be extracted without a lot of efforts
-    public HAND_RANK computeRank(Hand hand) {
-        String handAsString = hand.asString(SORT_CRITERIA.VALUE)
-            .toUpperCase().replace(CARD_CHAR_SEPARATOR, " ");
-        System.out.println(handAsString);
-
-
-        return HAND_RANK.NONE;
-    }
 
     /**
      * Methods that cast cardPile to hand
@@ -74,7 +63,7 @@ public class Hand extends CardPile {
         ArrayList<Card> combination = new ArrayList<Card>();
         // WARNING value 5 is for Round:river
         // NOT WORKING FOR OMAHA
-        int boardSize = Round.ROUND_CARD_COUNT.get(table.getRound().getRoundState());
+        int boardSize = Round.ROUND_CARD_COUNT.get(table.getRound().getRoundPhase());
 
         // Compute board alone
         HAND_RANK currentRank = RankEvaluator.evaluate(createHand(board)).getKey();

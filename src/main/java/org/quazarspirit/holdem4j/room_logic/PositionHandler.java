@@ -81,4 +81,6 @@ public class PositionHandler {
         _used_positions.remove(position_name);
         return true;
     }
+
+    public ArrayList<POSITION_NAME> getUsedPositions() { return _used_positions; }
 }

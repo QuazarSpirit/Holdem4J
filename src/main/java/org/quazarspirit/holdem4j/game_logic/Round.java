@@ -5,15 +5,18 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
+/**
+ *
+ */
 public class Round {
-    enum ROUND_STATE {
+    public enum ROUND_PHASE {
         // Specific to Game.VARIANTS.HOLDEM
         // TODO: Move to rule
-        NONE, PRE_FLOP, FLOP, TURN, RIVER;
-        public ROUND_STATE getNext() {
-            return this.ordinal() < ROUND_STATE.values().length - 1
-                    ? ROUND_STATE.values()[this.ordinal() + 1]
-                    : NONE;
+        PRE_FLOP, FLOP, TURN, RIVER;
+        public ROUND_PHASE getNext() {
+            return this.ordinal() < ROUND_PHASE.values().length - 1
+                    ? ROUND_PHASE.values()[this.ordinal() + 1]
+                    : PRE_FLOP;
         }
 
         public int getDrawCount() {
@@ -29,21 +32,20 @@ public class Round {
     }
 
     // TODO: Refactor as rule
-    public static HashMap<ROUND_STATE, Integer> ROUND_CARD_COUNT = (HashMap<ROUND_STATE, Integer>) Map.ofEntries(
-            entry(ROUND_STATE.NONE, 0),
-            entry(ROUND_STATE.PRE_FLOP, 0),
-            entry(ROUND_STATE.FLOP, 3),
-            entry(ROUND_STATE.TURN, 4),
-            entry(ROUND_STATE.RIVER, 5)
+    public static HashMap<ROUND_PHASE, Integer> ROUND_CARD_COUNT = (HashMap<ROUND_PHASE, Integer>) Map.ofEntries(
+            entry(ROUND_PHASE.PRE_FLOP, 0),
+            entry(ROUND_PHASE.FLOP, 3),
+            entry(ROUND_PHASE.TURN, 4),
+            entry(ROUND_PHASE.RIVER, 5)
     );
 
-    private ROUND_STATE _roundState = ROUND_STATE.NONE;
+    private ROUND_PHASE _roundPhase = ROUND_PHASE.PRE_FLOP;
 
     public void next() {
-        _roundState = _roundState.getNext();
+        _roundPhase = _roundPhase.getNext();
     }
 
-    public ROUND_STATE getRoundState() {
-        return _roundState;
+    public ROUND_PHASE getRoundPhase() {
+        return _roundPhase;
     }
 }
