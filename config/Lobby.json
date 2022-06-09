@@ -1,0 +1,11 @@
+{
+  "Games": [
+    {
+      "VARIANT": "HOLDEM",
+      "BET_STRUCTURE": "NO_LIMIT",
+      "MAX_SEATS": "SHORT_HANDED",
+      "PLAYER_TYPE": "AI",
+      "MAX_STACK_SIZE": 100
+    }
+  ]
+}

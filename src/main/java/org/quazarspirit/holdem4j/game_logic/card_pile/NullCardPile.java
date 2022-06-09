@@ -22,6 +22,15 @@ public class NullCardPile implements ICardPile {
     @Override
     public void sort(CardPile.SORT_CRITERIA criteria) {}
 
+    /**
+     * @param cardPileToCheck
+     * @return
+     */
+    @Override
+    public boolean equals(ICardPile cardPileToCheck) {
+        return this == cardPileToCheck;
+    }
+
     @Override
     public int size() {
         return 0;

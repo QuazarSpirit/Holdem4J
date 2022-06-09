@@ -43,7 +43,6 @@ public class RankEvaluator {
             return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(Hand.HAND_RANK.STRAIGHT, isStraightCheck.getValue());
         }
 
-        // TODO: REPAIR
         HandRankInfo rankInfo = getRankRepetitions(refHand);
         ArrayList<Map.Entry<Integer, String>> rankRepetition = rankInfo.getRankRepetitions();
         int rnkRepSize = rankRepetition.size();
@@ -94,7 +93,6 @@ public class RankEvaluator {
      */
     static private Map.Entry<Boolean, HandRankInfo> isStraight(@NotNull Hand refHand) {
         Hand hand = new Hand(refHand);
-        // TODO: REFACTORISATION with isFlush
         hand.sort(CardPile.SORT_CRITERIA.RANK);
 
         String handAsString = hand.asString(CardPile.SORT_CRITERIA.RANK, "");
@@ -198,11 +196,15 @@ public class RankEvaluator {
         }
 
 
-        int rep_0 = rankRepetitions.get(0).getKey();
-        int rep_1 =  rankRepetitions.get(1).getKey();
+        int TOK_index, Pair_index;
 
-        int TOK_index = rep_0 > rep_1 ? 0 : 1;
-        int Pair_index = rep_0 > rep_1 ? 1 : 0;
+        int rep_0 = rankRepetitions.get(0).getKey();
+        if (rankRepetitions.size() == 2) {
+            int rep_1 =  rankRepetitions.get(1).getKey();
+            TOK_index = rep_0 > rep_1 ? 0 : 1;
+            Pair_index = rep_0 > rep_1 ? 1 : 0;
+
+        } else { TOK_index = 0; Pair_index = 0; }
         HandRankInfo handRankInfo = new HandRankInfo(rankRepetitions, Card.RANKS.indexOf(rankRepetitions.get(TOK_index).getValue()));
         handRankInfo.setPairIndex(Pair_index);
         return handRankInfo;

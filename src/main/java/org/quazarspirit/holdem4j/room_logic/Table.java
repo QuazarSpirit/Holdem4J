@@ -1,5 +1,6 @@
 package org.quazarspirit.holdem4j.room_logic;
 
+import org.json.JSONObject;
 import org.quazarspirit.holdem4j.game_logic.Pot;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Board;
 import org.quazarspirit.holdem4j.game_logic.Game;
@@ -7,35 +8,40 @@ import org.quazarspirit.holdem4j.game_logic.Round;
 import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.NullCardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.PocketCards;
-import org.quazarspirit.holdem4j.room_logic.player_logic.IPlayer;
-import org.quazarspirit.holdem4j.room_logic.player_logic.NullPlayer;
+import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.NullPlayer;
+import org.quazarspirit.holdem4j.player_logic.PLAYER_INTENT;
+import org.quazarspirit.utils.ImmutableKV;
+import org.quazarspirit.utils.publisher_subscriber_pattern.Publisher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Table {
-    private int _maxPlayerCount = 0;
-    protected HashMap<PositionHandler.POSITION_NAME, IPlayer> players = new HashMap<>();
+public class Table extends Publisher {
+    private final int _maxPlayerCount;
+    protected boolean isOpened = true;
+    protected HashMap<Position.NAME, IPlayer> players = new HashMap<>();
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
-    protected boolean isOpened = false;
+    protected HashMap<IPlayer, Integer> playersStack = new HashMap<>();
+    final private ArrayList<ImmutableKV<IPlayer, PLAYER_INTENT>> _waitingPlayers = new ArrayList<>();
+    private boolean _isInStasis = true;
+    final private Dealer _dealer;
     final private Round _round = new Round();
-    final private Dealer _dealer = new Dealer(this);
     final private Board _board = new Board();
-
-    final private Pot _pot = new Pot(Game.BET_STRUCTURE.NO_LIMIT);
-    final private PositionHandler _positionHandler = new PositionHandler();
-    final Game _game; // = new Game(Game.VARIANT.HOLDEM, Game.BET_STRUCTURE.NO_LIMIT);
-    Table(int maxPlayerCount, Game game) {
-        this._maxPlayerCount = maxPlayerCount;
-        this._game = game;
+    final private Position _positionHandler = new Position();
+    final private Pot _pot;
+    final private Game _game; // = new Game(Game.VARIANT.HOLDEM, Game.BET_STRUCTURE.NO_LIMIT);
+    Table(Game game) {
+        _game = game;
+        _maxPlayerCount = _game.getMaxPlayerCount();
+        _pot = new Pot(_game.getBetStructure());
+        _dealer = new Dealer(this);
     }
-
-    void run() {
-        do {
-            _dealer.run();
-            _round.next();
-        } while(players.size() > 1);
+    public void nextRoundPhase() {
+        System.out.println("------------\n " + _round.getRoundPhase().toString());
+        _round.next();
+        _isInStasis = (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS);
     }
     public ICardPile getPocketCards(IPlayer player) {
         final ICardPile NCP = NullCardPile.GetSingleton();
@@ -51,51 +57,103 @@ public class Table {
        return cardPile;
     }
     public Round getRound() { return _round; }
+    public Dealer getDealer() { return _dealer; }
     public void setPlayerPocketCards(IPlayer player, PocketCards newPocketCards) {
         playersPocketCard.replace(player, newPocketCards);
     }
-    public ArrayList<PositionHandler.POSITION_NAME> getUsedPositions() { return _positionHandler.getUsedPositions();}
-    boolean addPlayer(IPlayer player) {
-        if  (players.size() + 1 > _maxPlayerCount
-                || _contains(player)) {
-            return false;
+    public ArrayList<Position.NAME> getUsedPositions() { return _positionHandler.getUsed(); }
+    public ArrayList<Position.NAME> getPlayingPositions() { return _positionHandler.getPlaying(); }
+    public void addPlayer(IPlayer player) {
+        // Test if player is not already connected to table
+        if (_contains(player)) { return; }
+
+        // Test if futurePlayer is superior to max allowed player count
+        int futurePlayerCount = players.size() + 1;
+        if (futurePlayerCount >= _maxPlayerCount) {
+            isOpened = false;
+            if (futurePlayerCount > _maxPlayerCount || _contains(player)) {
+                return;
+            }
         }
 
-        players.put(_positionHandler.pickFreePosition(), player);
-        playersPocketCard.put(player, new PocketCards());
-        return true;
-    }
-    boolean removePlayer(IPlayer player) {
-        if (!_contains(player)) { return false; }
+        if (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS) {
+            _positionHandler.update(_maxPlayerCount, players.size());
+            Position.NAME freePosition = _positionHandler.pickFree();
+            players.put(freePosition, player);
+        } else {
+            _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.JOIN));
+        }
 
-        PositionHandler.POSITION_NAME positionToRemove = getPosition(player);
-        players.remove(positionToRemove);
-        playersPocketCard.remove(player);
-        _positionHandler.releasePosition(positionToRemove);
-        return true;
+        playersPocketCard.put(player, new PocketCards());
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", PLAYER_INTENT.JOIN);
+        publish(jsonObject);
+    }
+    public void removePlayer(IPlayer player) {
+        // ONLY if CASH_GAME
+        isOpened = true;
+        if (!_contains(player)) { return; }
+
+
+        if (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS) {
+            Position.NAME positionToRemove = getPositionFromPlayer(player);
+            players.remove(positionToRemove);
+            playersPocketCard.remove(player);
+            _positionHandler.release(positionToRemove);
+        } else {
+            _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.LEAVE));
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", PLAYER_INTENT.LEAVE);
+        publish(jsonObject);
     }
     public int getPlayerCount() { return players.size(); }
     public int getMaxPlayerCount() { return _maxPlayerCount; }
-    public IPlayer getPlayerFromPosition(PositionHandler.POSITION_NAME position_name) {
-        IPlayer player = players.get(position_name);
-        if (player == null) {
-            return NullPlayer.GetSingleton();
+    public IPlayer getPlayerFromPosition(Position.NAME positionName) {
+        if (players.containsKey(positionName)) {
+            return players.get(positionName);
         }
-        return player;
+
+        return NullPlayer.GetSingleton();
     }
-    public PositionHandler.POSITION_NAME getPosition(IPlayer concretePlayer) {
-        for (Map.Entry<PositionHandler.POSITION_NAME, IPlayer> e: players.entrySet()) {
+    public Position.NAME getPositionFromPlayer(IPlayer concretePlayer) {
+        for (Map.Entry<Position.NAME, IPlayer> e: players.entrySet()) {
             if (e.getValue().equals(concretePlayer)) {
                 return e.getKey();
             }
         }
 
-        return PositionHandler.POSITION_NAME.NONE;
+        return Position.NAME.NONE;
+    }
+    public void foldPosition(Position.NAME foldPositionName) {
+        _positionHandler.releasePlaying(foldPositionName);
     }
     public Board getBoard() { return _board; }
+    public Game getGame() { return _game; }
+    public Pot getPot() { return _pot; }
+
+    /**
+     * Mandatory payment of blinds by players
+     */
+    public int blindBet() {
+        IPlayer player_SB = getPlayerFromPosition(Position.NAME.SB);
+        IPlayer player_BB = getPlayerFromPosition(Position.NAME.BB);
+
+        int BB = _game.getBB();
+        int SB = BB / 2;
+        /* TODO: Implements banking system
+        playersStack.put(player_SB, playersStack.get(player_SB) - SB);
+        playersStack.put(player_BB,  playersStack.get(player_BB) - BB);
+         */
+
+        return BB + SB;
+
+    }
     private boolean _contains(IPlayer playerToCheck) {
         for (IPlayer player : players.values()) {
-            if (player == playerToCheck) {
+            if (player.equals(playerToCheck)) {
                 return true;
             }
         }

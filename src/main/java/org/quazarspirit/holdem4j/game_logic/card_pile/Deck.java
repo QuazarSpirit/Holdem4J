@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j.game_logic.card_pile;
 
 import org.quazarspirit.holdem4j.game_logic.Card;
+import org.quazarspirit.holdem4j.game_logic.Game;
 
 import java.util.Random;
 
@@ -12,6 +13,11 @@ public class Deck extends CardPile {
     public Deck() {
         super();
         init();
+    }
+
+    public Deck(Game game) {
+        super();
+        init(game.getGameVariant().getCardRanks());
     }
 
     /**
@@ -72,7 +78,20 @@ public class Deck extends CardPile {
     }
     public void burn() {
         Card card = pick(0);
+        discard(card);
+    }
+
+    public void discard(Card card) {
         discardPile.pushCard(card);
+    }
+
+    public void discard(ICardPile iCardPile) {
+        if (iCardPile != NullCardPile.GetSingleton()) {
+            CardPile cardPile = (CardPile) iCardPile;
+            for(Card card: cardPile.cards) {
+                discardPile.pushCard(card);
+            }
+        }
     }
 
     public DiscardPile getDiscardPile() { return discardPile; }

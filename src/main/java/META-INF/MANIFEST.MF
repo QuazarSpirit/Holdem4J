@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Main-Class: org.quazarspirit.utils.message_queue_pattern.MessageQueue
+Class-Path: dotenv-java-2.2.3.jar easy-rules-mvel-4.1.0.jar slf4j-api-1.
+ 7.30.jar slf4j-simple-1.7.36.jar junit-jupiter-5.8.1.jar junit-jupiter-
+ api-5.8.1.jar opentest4j-1.2.0.jar junit-platform-commons-1.8.1.jar api
+ guardian-api-1.1.2.jar junit-jupiter-params-5.8.1.jar junit-jupiter-eng
+ ine-5.8.1.jar junit-platform-engine-1.8.1.jar json-20220320.jar easy-ru
+ les-support-4.1.0.jar mvel2-2.4.10.Final.jar easy-rules-core-4.1.0.jar 
+ annotations-23.0.0.jar
+

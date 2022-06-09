@@ -3,9 +3,9 @@ package org.quazarspirit.holdem4j.game_logic.card_pile;
 import org.quazarspirit.holdem4j.game_logic.Card;
 import org.quazarspirit.holdem4j.game_logic.RankEvaluator;
 import org.quazarspirit.holdem4j.game_logic.Round;
+import org.quazarspirit.holdem4j.room_logic.Position;
 import org.quazarspirit.holdem4j.room_logic.Table;
-import org.quazarspirit.holdem4j.room_logic.PositionHandler;
-import org.quazarspirit.holdem4j.room_logic.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.IPlayer;
 
 import java.util.ArrayList;
 
@@ -49,9 +49,9 @@ public class Hand extends CardPile {
         return hand;
     }
 
-    HAND_RANK computeRank(Table table, PositionHandler.POSITION_NAME position_name) {
+    HAND_RANK computeRank(Table table, Position.NAME _name) {
         Board board = table.getBoard();
-        IPlayer player = table.getPlayerFromPosition(position_name);
+        IPlayer player = table.getPlayerFromPosition(_name);
         ICardPile cardPile = table.getPocketCards(player);
 
         if (cardPile.equals(NullCardPile.GetSingleton())) {

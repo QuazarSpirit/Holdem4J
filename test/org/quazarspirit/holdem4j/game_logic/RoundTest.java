@@ -9,4 +9,12 @@ class RoundTest {
     @Test
     void next() {
     }
+
+    @Test
+    void testNext() {
+    }
+
+    @Test
+    void getRoundPhase() {
+    }
 }

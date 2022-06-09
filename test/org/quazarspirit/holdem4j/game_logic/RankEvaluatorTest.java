@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class RankEvaluatorTest {
-    Deck deckFromString(String str) {
+public class RankEvaluatorTest {
+    public static Deck deckFromString(String str) {
         Deck deck = new Deck();
         deck.clear();
         String[] splitStr = str.split(CardPile.CARD_CHAR_SEPARATOR);
@@ -120,7 +120,7 @@ class RankEvaluatorTest {
      * Particular straight tested here
      */
     void evaluateWheel() {
-        Deck deck = deckFromString("2c/3d/4h/5s/Ac/2d/3h/4s/5c/Ad/2h/3s/4c/5d/Ah/2s/3c/4d/5h/As");
+        Deck deck = RankEvaluatorTest.deckFromString("2c/3d/4h/5s/Ac/2d/3h/4s/5c/Ad/2h/3s/4c/5d/Ah/2s/3c/4d/5h/As");
         Hand hand = new Hand();
 
             for(int i = 0; i < deck.size(); i+=5) {
@@ -205,7 +205,7 @@ class RankEvaluatorTest {
         }
         handList.add(aceHand);
 
-        Deck deckTest = deckFromString("2c/2d/3c/3d/2h");
+        Deck deckTest = RankEvaluatorTest.deckFromString("2c/2d/3c/3d/2h");
         Hand testHand = new Hand();
         for (int k = 0; k < deckTest.size(); k+=1) {
             testHand.pushCard(deckTest.getCardAt(k));
@@ -241,7 +241,7 @@ class RankEvaluatorTest {
 
     @Test
     void evaluateThreeOfAKind() {
-        Deck deck = deckFromString("2c/2d/2h/3c/3d/3h/4c/4d/4h/5c/5d/5h/6c/6d/6h/7c/7d/7h/8c/8d/8h/9c/9d/9h/Tc/Td/Th/Jc/Jd/Jh/Qc/Qd/Qh/Kc/Kd/Kh/Ac/Ad/Ah/2s/3s");
+        Deck deck = RankEvaluatorTest.deckFromString("2c/2d/2h/3c/3d/3h/4c/4d/4h/5c/5d/5h/6c/6d/6h/7c/7d/7h/8c/8d/8h/9c/9d/9h/Tc/Td/Th/Jc/Jd/Jh/Qc/Qd/Qh/Kc/Kd/Kh/Ac/Ad/Ah/2s/3s");
         ArrayList<Hand> handList = new ArrayList<>();
         for(int i = 0; i < deck.size() -3; i += 3) {
             Hand hand = new Hand();
@@ -389,5 +389,42 @@ class RankEvaluatorTest {
             }
 
         }
+    }
+
+    @Test
+    void evaluatePocketCardsPair() {
+        Hand hand = new Hand();
+        hand.pushCard(new Card("Ac"));
+        hand.pushCard(new Card("Ad"));
+
+        Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
+        System.out.println(hand.asString());
+        assertEquals(eval.getKey(), Hand.HAND_RANK.PAIR);
+
+        Hand newHand = new Hand(hand);
+        newHand.sort(CardPile.SORT_CRITERIA.RANK);
+        String highness = newHand.asString(CardPile.SORT_CRITERIA.RANK);
+        highness = highness.substring(highness.length() - 1);
+
+        assertEquals(eval.getValue().highnessAsString(), highness);
+    }
+
+    @Test
+    void evaluatePocketCardsHighCard() {
+        Hand hand = new Hand();
+        hand.pushCard(new Card("Qc"));
+        hand.pushCard(new Card("7d"));
+
+        Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
+        System.out.println(hand.asString());
+        assertEquals(eval.getKey(), Hand.HAND_RANK.CARD_HIGH);
+
+        Hand newHand = new Hand(hand);
+        newHand.sort(CardPile.SORT_CRITERIA.RANK);
+        String highness = newHand.asString(CardPile.SORT_CRITERIA.RANK);
+        highness = highness.substring(highness.length() - 1);
+
+        assertEquals(eval.getValue().highnessAsString(), highness);
+
     }
 }

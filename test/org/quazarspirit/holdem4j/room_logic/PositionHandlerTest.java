@@ -2,52 +2,85 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PositionHandlerTest {
-    static final int FP_ORDER_LENGTH = PositionHandler.POSITION_NAME.FREE_POSITION_ORDER.length;
+    static final  HashMap<Integer, ArrayList<Position.NAME>> testValues = new HashMap<>() {{
+        put(6, new ArrayList<>() {{
+            add(Position.NAME.SB);
+            add(Position.NAME.BB);
+            add(Position.NAME.UTG);
+            add(Position.NAME.HIJACK);
+            add(Position.NAME.CO);
+            add(Position.NAME.BTN);
+        }});
+
+        put(4, new ArrayList<>() {{
+            add(Position.NAME.SB);
+            add(Position.NAME.BB);
+            add(Position.NAME.UTG);
+            add(Position.NAME.BTN);
+        }});
+
+        put(2, new ArrayList<>() {{
+            add(Position.NAME.SB);
+            add(Position.NAME.BB);
+        }});
+    }};
+    static final int FP_ORDER_LENGTH = Position.NAME.DEFAULT.length;
+    @Test
+    void update() {
+        for(Map.Entry<Integer, ArrayList<Position.NAME>> set: testValues.entrySet()) {
+            Position p = new Position();
+            p.update(10, set.getKey());
+            assertEquals(set.getValue(), p.getUsed());
+            assertEquals(10 - set.getKey(), p.getFreeCount());
+        }
+    }
 
     @Test
     void pickFreePosition() {
-        PositionHandler p = new PositionHandler();
         final int maxTableSize = 10;
 
-        p.update(maxTableSize, 2);
-        assertEquals(p.getFreePositionCount(), FP_ORDER_LENGTH);
+        for(int currentPlayerCount = 0; currentPlayerCount < maxTableSize; currentPlayerCount++) {
+            System.out.println("++++++++++++++++++++++++++\n" + currentPlayerCount + " " + maxTableSize);
+            Position p = new Position();
+            p.update(maxTableSize, currentPlayerCount);
+            assertEquals(FP_ORDER_LENGTH - currentPlayerCount, p.getFreeCount());
 
-        int i = 0;
-        while (p.getFreePositionCount() > 0) {
-            int fp_count = p.getFreePositionCount();
+            for(int i = currentPlayerCount; i < FP_ORDER_LENGTH; i++) {
+                int fp_count = p.getFreeCount();
+                System.out.println("-----------------\n" + "Free positions count: " + fp_count + " current player count: " + i);
 
-            assertEquals(fp_count, FP_ORDER_LENGTH - i);
-            assertEquals(fp_count, FP_ORDER_LENGTH - i);
-            PositionHandler.POSITION_NAME pName = p.pickFreePosition();
+                assertEquals(fp_count, FP_ORDER_LENGTH - i);
+                assertEquals(fp_count, FP_ORDER_LENGTH - i);
+                Position.NAME pName = p.pickFree();
 
-            System.out.print(pName + " ");
-            assertEquals(pName,
-                    PositionHandler.POSITION_NAME.FREE_POSITION_ORDER[FP_ORDER_LENGTH - i - 1]);
-            assertEquals(pName,
-                    PositionHandler.POSITION_NAME.SEAT_POSITION_ORDER[i + 2]);
-            i++;
+                System.out.println(pName + " ");
+                assertEquals(Position.NAME.PRIORITY_ORDER[i], pName);
+            }
         }
     }
 
     @Test
     void releaseFreePosition() {
-        PositionHandler p = new PositionHandler();
+        Position p = new Position();
 
         p.update(10, 10);
-        assertEquals(p.getFreePositionCount(), 0);
-        System.out.print(p.getFreePositionCount() + " ");
+        assertEquals(0, p.getFreeCount());
 
-        int i = 0;
-        while (p.getFreePositionCount() != FP_ORDER_LENGTH) {
-            int fp_count = p.getFreePositionCount();
-            PositionHandler.POSITION_NAME pName =
-                    PositionHandler.POSITION_NAME.FREE_POSITION_ORDER[FP_ORDER_LENGTH - i - 1];
-            assertTrue(p.releasePosition(pName));
-            assertEquals(fp_count, i);
-            i++;
+        int i = Position.NAME.DEFAULT.length;
+        while (p.getFreeCount() != FP_ORDER_LENGTH) {
+            int fp_count = p.getFreeCount();
+            Position.NAME pName = Position.NAME.DEFAULT[i - 1];
+            System.out.print(" " + pName + " " + fp_count);
+            assertTrue(p.release(pName));
+            assertEquals(10 - fp_count, i);
+            i--;
         }
     }
 }

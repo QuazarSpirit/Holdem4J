@@ -2,17 +2,16 @@ package org.quazarspirit.holdem4j.game_logic;
 
 public class Pot {
     private int _size = 0;
-
-    private Game.BET_STRUCTURE _betStructure = Game.BET_STRUCTURE.NO_LIMIT;
+    private Game.BET_STRUCTURE _betStructure;
 
     public Pot(Game.BET_STRUCTURE betStructure) {
         _betStructure = betStructure;
     }
 
-    int getSize() {return _size; }
+    public int getSize() {return _size; }
 
     // TODO: Handle different betStructure
-    void addToPot(int betSize) { _size += betSize; }
+    public void add(int betSize) { _size += betSize; }
 
-    void reset() {_size = 0;}
+    public void reset() {_size = 0;}
 }

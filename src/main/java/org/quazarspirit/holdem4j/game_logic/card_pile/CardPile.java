@@ -23,6 +23,24 @@ public abstract class CardPile implements ICardPile {
         }
         return false;
     }
+
+    public boolean equals(ICardPile cardPileToCheck) {
+        this.sort(SORT_CRITERIA.RANK);
+        cardPileToCheck.sort(SORT_CRITERIA.RANK);
+
+        if (this.size() != cardPileToCheck.size()) {
+            return false;
+        }
+
+        for(int i = 0; i < cards.size(); i+=1) {
+            if (! this.getCardAt(i).getValue().equals(cardPileToCheck.getCardAt(i).getValue())) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     @Override
     public int size() {
         return cards.size();

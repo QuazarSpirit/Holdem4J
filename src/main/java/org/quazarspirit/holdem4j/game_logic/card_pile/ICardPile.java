@@ -12,4 +12,6 @@ public interface ICardPile {
     public Card getCardAt(int index);
     public boolean contains(Card cardToCheck);
     public void sort(CardPile.SORT_CRITERIA criteria);
+
+    public boolean equals(ICardPile cardPileToCheck);
 }
