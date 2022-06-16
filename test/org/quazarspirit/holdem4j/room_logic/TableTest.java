@@ -6,6 +6,7 @@ import org.quazarspirit.holdem4j.game_logic.Round;
 import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
 import org.quazarspirit.holdem4j.player_logic.BotPlayer;
 import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.view.LogTableView;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -17,10 +18,12 @@ public class TableTest {
 
     static Table initTableWithPlayers(ArrayList<IPlayer> iPlayers, int count, Game game) {
         Table table = new Table(game);
+        LogTableView logTableView = new LogTableView();
+        table.addSubscriber(logTableView);
 
         for (int i = 0; i < count; i+=1) {
-            BotPlayer bot1 = new BotPlayer(UUID.randomUUID(), "Bot");
-            table.addPlayer(bot1);
+            BotPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-" + i);
+            table.addPlayer(bot);
         }
 
         for(Position.NAME positionName: table.getUsedPositions()) {
@@ -32,10 +35,11 @@ public class TableTest {
 
     @Test
     void nextRoundPhase() {
-        Table table = new Table(testGame);
+        ArrayList<IPlayer> iPlayers = new ArrayList<>();
+        Table table = TableTest.initTableWithPlayers(iPlayers, 3, testGame);
 
         for(int i = 0; i < Round.ROUND_PHASE.values().length; i += 1) {
-            assertEquals(table.getRound().getRoundPhase(), Round.ROUND_PHASE.values()[i]);
+            assertEquals(Round.ROUND_PHASE.values()[i], table.getRound().getRoundPhase());
             table.nextRoundPhase();
         }
     }

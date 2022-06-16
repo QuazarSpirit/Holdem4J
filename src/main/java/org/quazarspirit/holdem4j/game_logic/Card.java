@@ -58,34 +58,4 @@ public class Card {
     }
     public int getColorAsInt() { return COLORS.indexOf(this._color); }
     public String getValue() { return this._value; }
-    public static void main(String[] args) {
-        while(true) {
-            System.out.println("Type q to exit");
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Enter card rank (" + RANKS + "):");
-            String rank = sc.nextLine();
-
-            if (rank.equals("q")) {
-                break;
-            }
-
-            System.out.println("Enter card colour (" + COLORS + "):");
-            String color = sc.nextLine();
-
-            if (color.equals("q")) {
-                break;
-            }
-
-
-            String card_value = rank + color;
-            System.out.println(card_value);
-
-            try {
-                Card card = new Card(card_value);
-                System.out.println("Poker card value: " + card.getValue());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }// main()
 }

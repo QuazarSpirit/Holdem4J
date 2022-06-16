@@ -1,5 +1,7 @@
 package org.quazarspirit.holdem4j.game_logic;
 
+import org.quazarspirit.utils.publisher_subscriber_pattern.IEventType;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,10 @@ public class Round {
             return _drawCount;
         }
 
+    }
+
+    public enum EVENT implements IEventType {
+        NEXT;
     }
 
     // TODO: Refactor as rule

@@ -12,13 +12,17 @@ import org.quazarspirit.holdem4j.player_logic.IPlayer;
 import org.quazarspirit.holdem4j.player_logic.NullPlayer;
 import org.quazarspirit.holdem4j.player_logic.PLAYER_INTENT;
 import org.quazarspirit.utils.ImmutableKV;
-import org.quazarspirit.utils.publisher_subscriber_pattern.Publisher;
+import org.quazarspirit.utils.publisher_subscriber_pattern.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Table extends Publisher {
+public class Table extends Thread implements ITable, ISubscriber, IPublisher {
+    public enum EVENT implements IEventType {
+        TIMEOUT;
+    }
+
     private final int _maxPlayerCount;
     protected boolean isOpened = true;
     protected HashMap<Position.NAME, IPlayer> players = new HashMap<>();
@@ -27,21 +31,31 @@ public class Table extends Publisher {
     final private ArrayList<ImmutableKV<IPlayer, PLAYER_INTENT>> _waitingPlayers = new ArrayList<>();
     private boolean _isInStasis = true;
     final private Dealer _dealer;
-    final private Round _round = new Round();
+    final private Round  _round = new Round();
     final private Board _board = new Board();
-    final private Position _positionHandler = new Position();
+    final private Position _positionHandler;
     final private Pot _pot;
     final private Game _game; // = new Game(Game.VARIANT.HOLDEM, Game.BET_STRUCTURE.NO_LIMIT);
+
+    final private Publisher _publisher = new Publisher(this);
     Table(Game game) {
         _game = game;
         _maxPlayerCount = _game.getMaxPlayerCount();
         _pot = new Pot(_game.getBetStructure());
         _dealer = new Dealer(this);
+        _positionHandler = new Position();
+
     }
-    public void nextRoundPhase() {
+    public synchronized void nextRoundPhase() {
+        //Round.ROUND_PHASE roundPhase = _round.getRoundPhase();
         System.out.println("------------\n " + _round.getRoundPhase().toString());
         _round.next();
         _isInStasis = (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", Round.EVENT.NEXT);
+        //jsonObject.put("round_phase", roundPhase);
+        publish(jsonObject);
     }
     public ICardPile getPocketCards(IPlayer player) {
         final ICardPile NCP = NullCardPile.GetSingleton();
@@ -80,6 +94,8 @@ public class Table extends Publisher {
             _positionHandler.update(_maxPlayerCount, players.size());
             Position.NAME freePosition = _positionHandler.pickFree();
             players.put(freePosition, player);
+            _dealer.addSubscriber(player);
+            player.addSubscriber(_dealer);
         } else {
             _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.JOIN));
         }
@@ -100,7 +116,9 @@ public class Table extends Publisher {
             Position.NAME positionToRemove = getPositionFromPlayer(player);
             players.remove(positionToRemove);
             playersPocketCard.remove(player);
-            _positionHandler.release(positionToRemove);
+            _dealer.removeSubscriber(player);
+            player.removeSubscriber(_dealer);
+            _positionHandler.releaseUsed(positionToRemove);
         } else {
             _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.LEAVE));
         }
@@ -158,5 +176,47 @@ public class Table extends Publisher {
             }
         }
         return false;
+    }
+
+    /**
+     * @param event
+     */
+    @Override
+    public void update(Event event) {
+        if(event.data.get("type") == DEALER_INTENT.QUERY_ACTION) {
+            try {
+                wait(2000);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("type", EVENT.TIMEOUT);
+                jsonObject.put("player", event.data.get("player"));
+                publish(jsonObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * @param subscriber
+     */
+    @Override
+    public void addSubscriber(ISubscriber subscriber) {
+        _publisher.addSubscriber(subscriber);
+    }
+
+    /**
+     * @param subscriber
+     */
+    @Override
+    public void removeSubscriber(ISubscriber subscriber) {
+        _publisher.removeSubscriber(subscriber);
+    }
+
+    /**
+     * @param jsonObject
+     */
+    @Override
+    public void publish(JSONObject jsonObject) {
+        _publisher.publish(jsonObject);
     }
 }

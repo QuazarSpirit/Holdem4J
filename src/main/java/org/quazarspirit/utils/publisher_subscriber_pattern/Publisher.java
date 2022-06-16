@@ -7,6 +7,16 @@ import java.util.ArrayList;
 public class Publisher implements IPublisher {
     final private ArrayList<ISubscriber> _subscribers = new ArrayList<>();
 
+    final private IPublisher _source;
+
+    public Publisher() {
+        _source = this;
+    }
+
+    public Publisher(IPublisher source) {
+        _source = source;
+    }
+
     /**
      * @param subscriber Subscriber object to add
      */
@@ -30,7 +40,7 @@ public class Publisher implements IPublisher {
      */
     @Override
     public void publish(JSONObject jsonObject) {
-        Event event = new Event(this, jsonObject);
+        Event event = new Event(this._source, jsonObject);
         for(ISubscriber subscriber: _subscribers) {
             subscriber.update(event);
         }

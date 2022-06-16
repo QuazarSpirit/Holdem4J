@@ -2,6 +2,7 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.quazarspirit.holdem4j.game_logic.Game;
 import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.view.LogTableView;
 
 import java.util.*;
 
@@ -102,6 +103,9 @@ public class Lobby {
                     return availableTable;
                 } else {
                     Table table = new Table(game);
+                    LogTableView logTableView = new LogTableView();
+                    table.addSubscriber(logTableView);
+
                     _gameToTables.get(game).add(table);
                     return table;
                 }

@@ -31,6 +31,33 @@ public class NullCardPile implements ICardPile {
         return this == cardPileToCheck;
     }
 
+    /**
+     * @param sortCriteria
+     * @return
+     */
+    @Override
+    public String asString(CardPile.SORT_CRITERIA sortCriteria) {
+        return "NONE";
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public String asString() {
+        return "NONE";
+    }
+
+    /**
+     * @param sortCriteria
+     * @param separator
+     * @return
+     */
+    @Override
+    public String asString(CardPile.SORT_CRITERIA sortCriteria, String separator) {
+        return "NONE";
+    }
+
     @Override
     public int size() {
         return 0;

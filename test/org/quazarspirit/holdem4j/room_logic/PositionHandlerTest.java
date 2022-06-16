@@ -70,7 +70,8 @@ class PositionHandlerTest {
     void releaseFreePosition() {
         Position p = new Position();
 
-        p.update(10, 10);
+        int playerCount = 10;
+        p.update(10, playerCount);
         assertEquals(0, p.getFreeCount());
 
         int i = Position.NAME.DEFAULT.length;
@@ -78,8 +79,8 @@ class PositionHandlerTest {
             int fp_count = p.getFreeCount();
             Position.NAME pName = Position.NAME.DEFAULT[i - 1];
             System.out.print(" " + pName + " " + fp_count);
-            assertTrue(p.release(pName));
-            assertEquals(10 - fp_count, i);
+            p.releaseUsed(pName);
+            assertEquals(playerCount - fp_count, i);
             i--;
         }
     }
