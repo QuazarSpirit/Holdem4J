@@ -1,14 +1,12 @@
 package org.quazarspirit.utils.message_queue_pattern;
 
 import com.sun.net.httpserver.*;
-import org.quazarspirit.holdem4j.room_logic.Position;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 

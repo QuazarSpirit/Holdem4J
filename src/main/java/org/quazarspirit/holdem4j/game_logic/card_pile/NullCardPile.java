@@ -83,6 +83,8 @@ public class NullCardPile implements ICardPile {
     public boolean pushCard(Card card) {
         return false;
     }
+    @Override
+    public void pushCard(ICardPile iCardPile) {}
 
     @Override
     public Card getCardAt(int index) {

@@ -1,0 +1,62 @@
+HU Passive Draw
+
+Pre-condition:
+    Deck default non shuffled
+    Game HOLDEM NL 10 SHORT_HANDED CASHGAME
+
+1. Phase: STASIS
+    1.1 Player1 JOIN Table as Seat1
+    1.2 Player2 JOIN Table as Seat2
+
+2. Phase: PRE_FLOP
+    Positions: Seat1=SB Seat2=BB
+    Dealer asks BLIND_BETS
+    2.1 Deal step:
+        2.1.1 Dealer DEAL POCKET_CARDS SB, BB
+    2.2 Bet step:
+        2.2.1 Dealer queries action from SB
+        2.2.2 SB act is CALL 1 SB
+        2.2.3 Dealer queries action from BB
+        2.2.4 BB act is CHECK
+        2.2.5 Dealer goes to NEXT ROUND_PHASE
+
+3. Phase: FLOP
+    3.1 Deal step:
+        3.1.1 Dealer DRAW board FLOP
+    3.2 Bet step:
+        3.2.1 Dealer queries action from SB
+        3.2.2 SB act is CHECK
+        3.2.3 Dealer queries action from BB
+        3.2.4 BB act is CHECK
+        3.2.5 Dealer goes to NEXT ROUND_PHASE
+
+
+4. Phase: TURN
+    4.1 Deal step:
+        4.1.1 Dealer DRAW board TURN
+    4.2 Bet step:
+        4.2.1 Dealer queries action from SB
+        4.2.2 SB act is CHECK
+        4.2.3 Dealer queries action from BB
+        4.2.4 BB act is CHECK
+        4.2.5 Dealer goes to NEXT ROUND_PHASE
+
+
+5. Phase: RIVER
+    5.1 Deal step:
+        5.1.1 Dealer DRAW board RIVER
+    5.2 Bet step:
+        5.2.1 Dealer queries action from SB
+        5.2.2 SB act is CHECK
+        5.2.3 Dealer queries action from BB
+        5.2.4 BB act is CHECK
+        5.2.5 Dealer goes to NEXT ROUND_PHASE
+
+
+6. Phase: SHOWDOWN
+    6.1 Dealer ask Table to SHOWDOWN SB, BB
+    6.2 Dealer EVALUATE POCKET_CARDS vs BOARD
+    6.3 Player1, Player2 WINS by DRAW
+    6.4 Dealer subtract RAKE from POT
+    6.5 Dealer SPLIT POT for Player1, Player2
+    6.6 Dealer resets TABLE for next round

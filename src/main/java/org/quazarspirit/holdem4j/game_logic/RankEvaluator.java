@@ -25,22 +25,22 @@ public class RankEvaluator {
 
         Map.Entry<Boolean, HandRankInfo> isRoyalFlushCheck = isRoyalFlush(refHand);
         if (isRoyalFlushCheck.getKey()) {
-            return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(Hand.HAND_RANK.ROYAL_FLUSH, isRoyalFlushCheck.getValue());
+            return new ImmutableKV<>(Hand.HAND_RANK.ROYAL_FLUSH, isRoyalFlushCheck.getValue());
         }
 
         Map.Entry<Boolean, HandRankInfo> isStraightFlushCheck = isStraightFlush(refHand);
         if (isStraightFlushCheck.getKey()) {
-            return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(Hand.HAND_RANK.STRAIGHT_FLUSH, isStraightFlushCheck.getValue());
+            return new ImmutableKV<>(Hand.HAND_RANK.STRAIGHT_FLUSH, isStraightFlushCheck.getValue());
         }
 
         Map.Entry<Boolean, HandRankInfo> isFlushCheck = isFlush(refHand);
         if (isFlushCheck.getKey()) {
-            return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(Hand.HAND_RANK.FLUSH, isFlushCheck.getValue());
+            return new ImmutableKV<>(Hand.HAND_RANK.FLUSH, isFlushCheck.getValue());
         }
 
         Map.Entry<Boolean, HandRankInfo> isStraightCheck = isStraight(refHand);
         if (isStraightCheck.getKey()) {
-            return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(Hand.HAND_RANK.STRAIGHT, isStraightCheck.getValue());
+            return new ImmutableKV<>(Hand.HAND_RANK.STRAIGHT, isStraightCheck.getValue());
         }
 
         HandRankInfo rankInfo = getRankRepetitions(refHand);
@@ -77,13 +77,13 @@ public class RankEvaluator {
                         + ":" + rankInfo.getRankRepetitions().get(rankInfo.getPairIndex()).getValue();
                 }
             }
-            return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(handRankResult, rankInfo);
+            return new ImmutableKV<>(handRankResult, rankInfo);
         }
 
         Hand hand = new Hand(refHand);
         hand.sort(CardPile.SORT_CRITERIA.RANK);
 
-        return new ImmutableKV<Hand.HAND_RANK, HandRankInfo>(Hand.HAND_RANK.CARD_HIGH, new HandRankInfo(null, hand.getCardAt(hand.size() -1).getRankAsInt()));
+        return new ImmutableKV<>(Hand.HAND_RANK.CARD_HIGH, new HandRankInfo(null, hand.getCardAt(hand.size() -1).getRankAsInt()));
     }
 
     /**

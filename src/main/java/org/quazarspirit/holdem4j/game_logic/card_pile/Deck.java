@@ -9,7 +9,7 @@ import java.util.Random;
  *
  */
 public class Deck extends CardPile {
-    protected DiscardPile discardPile = new DiscardPile();
+    protected final DiscardPile discardPile = new DiscardPile();
     public Deck() {
         super();
         init();
@@ -81,6 +81,12 @@ public class Deck extends CardPile {
         discard(card);
     }
 
+    public void burn(int discardNumber) {
+        for(int i = 0; i < discardNumber; i+=1) {
+            burn();
+        }
+    }
+
     public void discard(Card card) {
         discardPile.pushCard(card);
     }
@@ -93,6 +99,8 @@ public class Deck extends CardPile {
             }
         }
     }
+
+
 
     public DiscardPile getDiscardPile() { return discardPile; }
 }

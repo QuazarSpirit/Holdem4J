@@ -8,6 +8,7 @@ public interface ICardPile {
     public int getMaxSize();
     public boolean isEmpty();
     public boolean pushCard(Card card);
+    public void pushCard(ICardPile iCardPile);
     public Card getCardAt(int index);
     public boolean contains(Card cardToCheck);
     public void sort(CardPile.SORT_CRITERIA criteria);

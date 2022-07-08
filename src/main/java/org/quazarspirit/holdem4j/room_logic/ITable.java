@@ -1,32 +1,32 @@
 package org.quazarspirit.holdem4j.room_logic;
 
 import org.quazarspirit.holdem4j.game_logic.Game;
-import org.quazarspirit.holdem4j.game_logic.Pot;
-import org.quazarspirit.holdem4j.game_logic.Round;
+import org.quazarspirit.holdem4j.game_logic.chip_pile.Pot;
+import org.quazarspirit.holdem4j.game_logic.BettingRound;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Board;
 import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
-import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 
 import java.util.ArrayList;
 
 public interface ITable {
-    public Round getRound();
+    public BettingRound getRound();
 
     public Dealer getDealer();
 
     public ICardPile getPocketCards(IPlayer player);
 
-    public ArrayList<Position.NAME> getUsedPositions();
+    public ArrayList<POSITION> getUsedPositions();
 
-    public ArrayList<Position.NAME> getPlayingPositions();
+    public ArrayList<POSITION> getPlayingPositions();
 
     public int getPlayerCount();
 
     public int getMaxPlayerCount();
 
-    public IPlayer getPlayerFromPosition(Position.NAME positionName);
+    public IPlayer getPlayerFromPosition(POSITION positionName);
 
-    public Position.NAME getPositionFromPlayer(IPlayer concretePlayer);
+    public POSITION getPositionFromPlayer(IPlayer concretePlayer);
 
     public Board getBoard();
 

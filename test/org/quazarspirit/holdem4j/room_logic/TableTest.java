@@ -2,10 +2,10 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.junit.jupiter.api.Test;
 import org.quazarspirit.holdem4j.game_logic.Game;
-import org.quazarspirit.holdem4j.game_logic.Round;
+import org.quazarspirit.holdem4j.game_logic.BettingRound;
 import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
-import org.quazarspirit.holdem4j.player_logic.BotPlayer;
-import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.BotPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 import org.quazarspirit.holdem4j.view.LogTableView;
 
 import java.util.ArrayList;
@@ -14,23 +14,35 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TableTest {
-    static final Game testGame = new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, 100, Game.MAX_SEATS.FULL_RING);
+    public static final Game testGame = new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, 100, Game.MAX_SEATS.FULL_RING);
 
-    static Table initTableWithPlayers(ArrayList<IPlayer> iPlayers, int count, Game game) {
+    TableTest() {
+        System.setProperty("TEST", "true");
+    }
+
+    static Table initTableWithPlayers(ArrayList<IPlayer> iPlayers, int count, Game game, boolean logTable) {
         Table table = new Table(game);
-        LogTableView logTableView = new LogTableView();
-        table.addSubscriber(logTableView);
+
+        if (logTable) {
+            LogTableView logTableView = new LogTableView();
+            table.addSubscriber(logTableView);
+        }
 
         for (int i = 0; i < count; i+=1) {
             BotPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-" + i);
             table.addPlayer(bot);
+            iPlayers.add(bot);
         }
 
-        for(Position.NAME positionName: table.getUsedPositions()) {
-            iPlayers.add(table.getPlayerFromPosition(positionName));
-        }
+        //System.out.println("Count: " + count + " table count: " + table.getPlayerCount());
+        //System.out.println(table.getRound().getPhase() + " " + table.isOpened);
+        //System.out.println(table + " " + iPlayers);
 
         return table;
+    }
+
+    static Table initTableWithPlayers(ArrayList<IPlayer> iPlayers, int count, Game game) {
+        return initTableWithPlayers(iPlayers, count, game, true);
     }
 
     @Test
@@ -38,41 +50,47 @@ public class TableTest {
         ArrayList<IPlayer> iPlayers = new ArrayList<>();
         Table table = TableTest.initTableWithPlayers(iPlayers, 3, testGame);
 
-        for(int i = 0; i < Round.ROUND_PHASE.values().length; i += 1) {
-            assertEquals(Round.ROUND_PHASE.values()[i], table.getRound().getRoundPhase());
-            table.nextRoundPhase();
+        for(int i = 0; i < BettingRound.PHASE.values().length; i += 1) {
+            assertEquals(BettingRound.PHASE.values()[i], table.getRound().getPhase());
+            table.nextBettingRoundPhase();
         }
     }
 
     @Test
     void addPlayer() {
-        ArrayList<IPlayer> iPlayers = new ArrayList<>();
-        Table table = TableTest.initTableWithPlayers(iPlayers, 3, testGame);
+        for (int i = 1; i < testGame.getMaxSeatsCount(); i += 1) {
+            ArrayList<IPlayer> iPlayers = new ArrayList<>();
+            Table table = TableTest.initTableWithPlayers(iPlayers, i, testGame);
 
-        assertEquals(table.getPlayerFromPosition(Position.NAME.SB), iPlayers.get(0));
-        assertEquals(table.getPlayerFromPosition(Position.NAME.BB), iPlayers.get(1));
+            for (int j = 0; j < i; j += 1) {
+                assertEquals(table.getPlayerFromSeatNumber(j), iPlayers.get(j));
+            }
+        }
     }
 
     @Test
     void removePlayer() {
-        ArrayList<IPlayer> iPlayers = new ArrayList<>();
-        Table table = TableTest.initTableWithPlayers(iPlayers, 3, testGame);
+        for (int i = 1; i < testGame.getMaxSeatsCount(); i += 1) {
+            ArrayList<IPlayer> iPlayers = new ArrayList<>();
+            Table table = TableTest.initTableWithPlayers(iPlayers, i, testGame);
 
-        for(int i = 0; i < iPlayers.size(); i+=1) {
-            IPlayer player = iPlayers.get(i);
-            assertEquals(table.getPlayerCount(), iPlayers.size() - i);
-            table.removePlayer(player);
-            assertEquals(table.getPlayerCount(), iPlayers.size() - i - 1);
-
+            for(int j = 0; j < i; j+=1) {
+                IPlayer player = iPlayers.get(j);
+                assertEquals(table.getPlayerCount(), iPlayers.size() - j);
+                table.removePlayer(player);
+                assertEquals(table.getPlayerCount(), iPlayers.size() - j - 1);
+            }
         }
     }
 
     @Test
     void getPocketCards() {
-        ArrayList<IPlayer> iPlayers = new ArrayList<>();
-        Table table = TableTest.initTableWithPlayers(iPlayers, 3, testGame);
+        for (int i = 1; i < testGame.getMaxSeatsCount(); i += 1) {
+            ArrayList<IPlayer> iPlayers = new ArrayList<>();
+            Table table = TableTest.initTableWithPlayers(iPlayers, i, testGame);
 
-        ICardPile pocketCards = table.getPocketCards(iPlayers.get(0));
-        assertTrue(pocketCards.isEmpty());
+            ICardPile pocketCards = table.getPocketCards(iPlayers.get(i - 1));
+            assertTrue(pocketCards.isEmpty());
+        }
     }
 }

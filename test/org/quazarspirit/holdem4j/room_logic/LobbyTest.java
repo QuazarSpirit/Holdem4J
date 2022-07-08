@@ -2,7 +2,7 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.junit.jupiter.api.Test;
 import org.quazarspirit.holdem4j.game_logic.Game;
-import org.quazarspirit.holdem4j.player_logic.BotPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.BotPlayer;
 
 import java.util.UUID;
 
@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class LobbyTest {
     static final Game testGame = new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, Game.PLAYER_TYPE.AI);
     public Lobby createLobby() {
-        Lobby lobby = new Lobby();
+        Lobby lobby = Lobby.getSingleton();
         lobby.clearGames();
         lobby.addGame(testGame);
 

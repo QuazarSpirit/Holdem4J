@@ -12,7 +12,7 @@ public abstract class CardPile implements ICardPile {
         RANK, COLOR, VALUE
     }
     // TODO: Change by rules
-    static protected int _maxSize = 52;
+    static protected final int _maxSize = 52;
     final protected ArrayList<Card> cards = new ArrayList<Card>();
     @Override
     public boolean contains(Card cardToCheck) {
@@ -60,6 +60,16 @@ public abstract class CardPile implements ICardPile {
         cards.add(card);
         return true;
     }
+
+    public void pushCard(ICardPile iCardPile) {
+        if (iCardPile != NullCardPile.GetSingleton()) {
+            CardPile cardPile = (CardPile) iCardPile;
+
+            for(Card card: cardPile.cards) {
+                pushCard(card);
+            }
+        }
+    }
     @Override
     public Card getCardAt(int index) {
         if (index >= 0 && index < cards.size()) {
@@ -98,7 +108,7 @@ public abstract class CardPile implements ICardPile {
             cardPileAsString.append(card_Str).append(CARD_CHAR_SEPARATOR);
         }
 
-        // Remove last "/"
+        // Remove last "/" ($ means last character in regex DSL)
         return cardPileAsString.toString().replaceAll(CARD_CHAR_SEPARATOR + "$", "");
     }
 
@@ -131,10 +141,10 @@ public abstract class CardPile implements ICardPile {
             return true;
         }
 
-        Iterator<Card> iter = cards.iterator();
-        Card current, previous = iter.next();
-        while (iter.hasNext()) {
-            current = iter.next();
+        Iterator<Card> iterator = cards.iterator();
+        Card current, previous = iterator.next();
+        while (iterator.hasNext()) {
+            current = iterator.next();
             if (compare(previous, current, sortCriteria) < 0) {
                 return false;
             }

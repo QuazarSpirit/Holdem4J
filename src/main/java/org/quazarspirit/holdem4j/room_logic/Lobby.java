@@ -1,8 +1,12 @@
 package org.quazarspirit.holdem4j.room_logic;
 
 import org.quazarspirit.holdem4j.game_logic.Game;
-import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_INTENT;
 import org.quazarspirit.holdem4j.view.LogTableView;
+import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
+import org.quazarspirit.utils.publisher_subscriber_pattern.IEventType;
+import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
 
 import java.util.*;
 
@@ -11,15 +15,21 @@ import java.util.*;
  * Add player to these tables
  * Create bot to fill those tables
  */
-public class Lobby {
+public class Lobby implements ISubscriber {
+    public static final Lobby Singleton = new Lobby();
     private final ArrayList<Game> _games = new ArrayList<>() {{
         add(new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, 10));
     }};
     private final HashMap<Game, ArrayList<Table>> _gameToTables = new HashMap<>();
-    Lobby() {
+
+    private Lobby() {
         for(Game game: _games) {
             _gameToTables.put(game, new ArrayList<Table>());
         }
+    }
+
+    public static Lobby getSingleton() {
+        return Singleton;
     }
 
     /**
@@ -136,5 +146,16 @@ public class Lobby {
         }
 
         return result.toString();
+    }
+
+    /**
+     * @param event
+     */
+    @Override
+    public void update(Event event) {
+        IEventType eventType = (IEventType) event.data.get("type");
+        if (eventType == PLAYER_INTENT.JOIN) {
+            joinGame((IPlayer) event.source, (Game) event.data.get("game"));
+        }
     }
 }

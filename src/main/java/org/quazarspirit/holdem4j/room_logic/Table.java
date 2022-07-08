@@ -1,18 +1,19 @@
 package org.quazarspirit.holdem4j.room_logic;
 
 import org.json.JSONObject;
-import org.quazarspirit.holdem4j.game_logic.Pot;
-import org.quazarspirit.holdem4j.game_logic.card_pile.Board;
+import org.quazarspirit.utils.ImmutableKV;
+import org.quazarspirit.utils.publisher_subscriber_pattern.*;
 import org.quazarspirit.holdem4j.game_logic.Game;
-import org.quazarspirit.holdem4j.game_logic.Round;
+import org.quazarspirit.holdem4j.game_logic.BettingRound;
+import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.NullPlayer;
+import org.quazarspirit.holdem4j.game_logic.chip_pile.Pot;
+import org.quazarspirit.holdem4j.game_logic.chip_pile.Stack;
+import org.quazarspirit.holdem4j.game_logic.card_pile.Board;
 import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.NullCardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.PocketCards;
-import org.quazarspirit.holdem4j.player_logic.IPlayer;
-import org.quazarspirit.holdem4j.player_logic.NullPlayer;
-import org.quazarspirit.holdem4j.player_logic.PLAYER_INTENT;
-import org.quazarspirit.utils.ImmutableKV;
-import org.quazarspirit.utils.publisher_subscriber_pattern.*;
+import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_INTENT;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,43 +21,127 @@ import java.util.Map;
 
 public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     public enum EVENT implements IEventType {
-        TIMEOUT;
+        TIMEOUT, POT_ADD, POT_RESET;
     }
+
+    protected int _tableRoundCounter = 0;
 
     private final int _maxPlayerCount;
     protected boolean isOpened = true;
-    protected HashMap<Position.NAME, IPlayer> players = new HashMap<>();
+
+    protected final PlayerSeatRegistry _playerSeats;
+
+
+    /**
+     * @deprecated  replaced by {@link #_playerSeats}
+     */
+    @Deprecated
+    protected HashMap<POSITION, IPlayer> players = new HashMap<>();
+
+    protected HashMap<IPlayer, Stack> playersStack = new HashMap<>();
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
-    protected HashMap<IPlayer, Integer> playersStack = new HashMap<>();
     final private ArrayList<ImmutableKV<IPlayer, PLAYER_INTENT>> _waitingPlayers = new ArrayList<>();
-    private boolean _isInStasis = true;
     final private Dealer _dealer;
-    final private Round  _round = new Round();
+    final private BettingRound _bettingRound = new BettingRound();
     final private Board _board = new Board();
-    final private Position _positionHandler;
+    //final private PositionHandler _positionHandler;
     final private Pot _pot;
     final private Game _game; // = new Game(Game.VARIANT.HOLDEM, Game.BET_STRUCTURE.NO_LIMIT);
 
     final private Publisher _publisher = new Publisher(this);
-    Table(Game game) {
+    public Table(Game game) {
         _game = game;
-        _maxPlayerCount = _game.getMaxPlayerCount();
-        _pot = new Pot(_game.getBetStructure());
+        _maxPlayerCount = _game.getMaxSeatsCount();
+        _pot = new Pot(_game.getUnit());
+        _playerSeats = new PlayerSeatRegistry(_game);
+        this.addSubscriber(_playerSeats);
+        this.addSubscriber(_bettingRound);
         _dealer = new Dealer(this);
-        _positionHandler = new Position();
-
+        /*
+        _positionHandler = new PositionHandler();
+        this.addSubscriber(_positionHandler);
+         */
     }
-    public synchronized void nextRoundPhase() {
-        //Round.ROUND_PHASE roundPhase = _round.getRoundPhase();
-        System.out.println("------------\n " + _round.getRoundPhase().toString());
-        _round.next();
-        _isInStasis = (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS);
 
+    // TODO: Test with multiple complete rounds
+    public void nextBettingRoundPhase() {
+        System.out.println("------------\nCurrent phase: " + _bettingRound.getPhase().toString());
+        ///_bettingRound.nextPhase();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", Round.EVENT.NEXT);
-        //jsonObject.put("round_phase", roundPhase);
+        jsonObject.put("type", BettingRound.EVENT.NEXT);
+        jsonObject.put("round_phase", _bettingRound.getPhase().getNext());
         publish(jsonObject);
+
+        BettingRound.PHASE roundPhase = _bettingRound.getPhase();
+        System.out.println( _bettingRound.getPhase());
+
+        if (roundPhase == BettingRound.PHASE.STASIS) {
+            // Manage waiting players
+            manageWaitingPlayers();
+            // Update player seat
+            updatePlayerSeat();
+        } else if (roundPhase == BettingRound.PHASE.PRE_FLOP) {
+            System.out.println("Je passe ici");
+            _tableRoundCounter+=1;
+
+            updatePlayerPositions();
+
+        }
+        /*
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", BettingRound.EVENT.NEXT);
+        jsonObject.put("round_phase", _bettingRound.getPhase().getNext());
+        publish(jsonObject);
+         */
     }
+
+    public void resetBettingRoundPhase() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", BettingRound.EVENT.RESET);
+        jsonObject.put("round_phase",BettingRound.PHASE.STASIS);
+        publish(jsonObject);
+
+        // Manage waiting players
+        manageWaitingPlayers();
+        // Update player seat
+        updatePlayerSeat();
+    }
+
+    public void updatePlayerPositions() {
+        System.out.println("Updating player positions");
+
+        JSONObject bindPositionToSeatEventData = new JSONObject();
+        bindPositionToSeatEventData.put("type", PlayerSeatRegistry.EVENT.BIND);
+        bindPositionToSeatEventData.put("table_round_count", _tableRoundCounter);
+        publish(bindPositionToSeatEventData);
+    }
+
+    public void updatePlayerSeat() {
+        /* TODO: Debug
+        System.out.println("Updating player positions");
+        // Loop over player seats and update their position names
+        PositionHandler previousPositionHandler;
+
+        JSONObject eventData = new JSONObject();
+        eventData.put("type", PositionHandler.EVENT.ALLOCATE);
+        eventData.put("max_player_count", _maxPlayerCount);
+        eventData.put("player_count", _playersSeat.size());
+        publish(eventData);
+
+        for(Map.Entry<IPlayer, IPlayerSeat> kv: _playersSeat.entrySet()) {
+            _positionHandler.getUsed();
+            kv.getValue().setPosition();
+        }
+
+         */
+    }
+
+    public void manageWaitingPlayers() {
+        System.out.println("Managing waiting players");
+
+        // Make player leave / join if they want to
+    }
+
     public ICardPile getPocketCards(IPlayer player) {
         final ICardPile NCP = NullCardPile.GetSingleton();
         if (player.equals(NullPlayer.GetSingleton())) {
@@ -70,30 +155,72 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
        return cardPile;
     }
-    public Round getRound() { return _round; }
+
+    public Stack getStack(IPlayer player) {
+        // TODO: Implements
+        return new Stack(_game.getUnit());
+        /*
+        final ICardPile NCP = NullCardPile.GetSingleton();
+        if (player.equals(NullPlayer.GetSingleton())) {
+            return NCP;
+        }
+
+        ChipCount chipCount = playersStack.get(player);
+        if (chipCount == null) {
+            return NCP;
+        }
+
+        return chipCount;
+         */
+    }
+
+    public BettingRound getRound() { return _bettingRound; }
     public Dealer getDealer() { return _dealer; }
     public void setPlayerPocketCards(IPlayer player, PocketCards newPocketCards) {
-        playersPocketCard.replace(player, newPocketCards);
+        // Replace only if player is existing in array
+        if (playersPocketCard.get(player) != null) {
+            playersPocketCard.replace(player, newPocketCards);
+        }
     }
-    public ArrayList<Position.NAME> getUsedPositions() { return _positionHandler.getUsed(); }
-    public ArrayList<Position.NAME> getPlayingPositions() { return _positionHandler.getPlaying(); }
+
+    /**
+     * @Deprecated Use events instead
+     * @return
+     */
+    @Deprecated
+    public ArrayList<POSITION> getUsedPositions() { return _playerSeats._positionHandler.getUsed(); }
+
+    /**
+     * @Deprecated Use events instead
+     * @return
+     */
+    @Deprecated
+    public ArrayList<POSITION> getPlayingPositions() { return _playerSeats._positionHandler.getPlaying(); }
     public void addPlayer(IPlayer player) {
         // Test if player is not already connected to table
-        if (_contains(player)) { return; }
+        // or that the table is currently opened
+        if (_playerSeats._containsPlayer(player) || !isOpened) { return; }
 
         // Test if futurePlayer is superior to max allowed player count
         int futurePlayerCount = players.size() + 1;
         if (futurePlayerCount >= _maxPlayerCount) {
             isOpened = false;
-            if (futurePlayerCount > _maxPlayerCount || _contains(player)) {
+            if (futurePlayerCount > _maxPlayerCount) {
                 return;
             }
         }
 
-        if (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS) {
-            _positionHandler.update(_maxPlayerCount, players.size());
-            Position.NAME freePosition = _positionHandler.pickFree();
+
+        if (_bettingRound.getPhase() == BettingRound.PHASE.STASIS) {
+            /**
+             * @Deprecated use PlayerSeatRegistry instead
+             */
+            /*
+            POSITION freePosition = _positionHandler.pickFree();
             players.put(freePosition, player);
+            */
+            _playerSeats.add(player);
+
             _dealer.addSubscriber(player);
             player.addSubscriber(_dealer);
         } else {
@@ -104,49 +231,89 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", PLAYER_INTENT.JOIN);
+        jsonObject.put("player", player);
         publish(jsonObject);
     }
     public void removePlayer(IPlayer player) {
-        // ONLY if CASH_GAME
-        isOpened = true;
-        if (!_contains(player)) { return; }
+        if (_game.getFormat() == Game.FORMAT.CASHGAME) {
+            isOpened = true;
+        }
+
+        if (!_playerSeats._containsPlayer(player)) { return; }
 
 
-        if (_round.getRoundPhase() == Round.ROUND_PHASE.STASIS) {
-            Position.NAME positionToRemove = getPositionFromPlayer(player);
+        if (_bettingRound.getPhase() == BettingRound.PHASE.STASIS) {
+            POSITION positionToRemove = getPositionFromPlayer(player);
             players.remove(positionToRemove);
+
+            _playerSeats.remove(player);
+
             playersPocketCard.remove(player);
             _dealer.removeSubscriber(player);
             player.removeSubscriber(_dealer);
-            _positionHandler.releaseUsed(positionToRemove);
+
+            // TODO: Move to PlayerSeatRegistry.Update()
+            //_positionHandler.releaseUsed(positionToRemove);
         } else {
             _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.LEAVE));
         }
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", PLAYER_INTENT.LEAVE);
+        jsonObject.put("player", player);
         publish(jsonObject);
     }
-    public int getPlayerCount() { return players.size(); }
+    public int getPlayerCount() { return _playerSeats.size(); }
     public int getMaxPlayerCount() { return _maxPlayerCount; }
-    public IPlayer getPlayerFromPosition(Position.NAME positionName) {
+
+    @Deprecated
+    public IPlayer getPlayerFromPosition(POSITION positionName) {
         if (players.containsKey(positionName)) {
             return players.get(positionName);
         }
 
         return NullPlayer.GetSingleton();
     }
-    public Position.NAME getPositionFromPlayer(IPlayer concretePlayer) {
-        for (Map.Entry<Position.NAME, IPlayer> e: players.entrySet()) {
+
+    //TODO: Call from PlayerSeatRegistry
+    /*
+    public IPlayer getPlayerFromSeat(PlayerSeat playerSeat) {
+
+        for (Map.Entry<IPlayer, PlayerSeat> e: _playerSeats.entrySet()) {
+            if (e.getValue().equals(playerSeat)) {
+                return e.getKey();
+            }
+        }
+
+        return NullPlayer.GetSingleton();
+
+    }
+     */
+
+    @Deprecated
+    public POSITION getPositionFromPlayer(IPlayer concretePlayer) {
+        for (Map.Entry<POSITION, IPlayer> e: players.entrySet()) {
             if (e.getValue().equals(concretePlayer)) {
                 return e.getKey();
             }
         }
 
-        return Position.NAME.NONE;
+        return POSITION.NONE;
     }
-    public void foldPosition(Position.NAME foldPositionName) {
-        _positionHandler.releasePlaying(foldPositionName);
+
+    /*
+    public IPlayerSeat getSeatFromPlayer(IPlayer player) {
+        if (_playerSeats.containsKey(player)) {
+            return _playerSeats.get(player);
+        }
+
+        return (IPlayerSeat) NullPlayerSeat.GetSingleton();
+    }
+     */
+
+    public void foldPosition(POSITION foldPositionName) {
+        // TODO: Direct communication between PlayerSeatReg and Dealer
+        //_positionHandler.releasePlaying(foldPositionName);
     }
     public Board getBoard() { return _board; }
     public Game getGame() { return _game; }
@@ -156,8 +323,8 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
      * Mandatory payment of blinds by players
      */
     public int blindBet() {
-        IPlayer player_SB = getPlayerFromPosition(Position.NAME.SB);
-        IPlayer player_BB = getPlayerFromPosition(Position.NAME.BB);
+        IPlayer player_SB = getPlayerFromPosition(POSITION.SB);
+        IPlayer player_BB = getPlayerFromPosition(POSITION.BB);
 
         int BB = _game.getBB();
         int SB = BB / 2;
@@ -169,13 +336,10 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         return BB + SB;
 
     }
-    private boolean _contains(IPlayer playerToCheck) {
-        for (IPlayer player : players.values()) {
-            if (player.equals(playerToCheck)) {
-                return true;
-            }
-        }
-        return false;
+
+
+    public IPlayer getPlayerFromSeatNumber(int seatNumber) {
+        return _playerSeats.getPlayerFromSeatNumber(seatNumber);
     }
 
     /**
@@ -183,7 +347,8 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
      */
     @Override
     public void update(Event event) {
-        if(event.data.get("type") == DEALER_INTENT.QUERY_ACTION) {
+        IEventType eventType = (IEventType) event.data.get("type");
+        if(eventType == DEALER_INTENT.QUERY_ACTION) {
             try {
                 wait(2000);
                 JSONObject jsonObject = new JSONObject();
@@ -193,28 +358,33 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (eventType == PLAYER_INTENT.JOIN || eventType == PLAYER_INTENT.LEAVE) {
+            JSONObject jsonObject = event.data;
+            jsonObject.put("player", event.source);
+            publish(jsonObject);
+        } else if (eventType == EVENT.POT_ADD) {
+            _pot.add((int) event.data.get("value"));
+            JSONObject jsonObject = event.data;
+            publish(jsonObject);
+        } else if (eventType == BettingRound.EVENT.NEXT) {
+            if (_dealer == event.source) {
+                // TODO: Dealer send BettingRound.EVENT.NEXT
+                nextBettingRoundPhase();
+            }
         }
+
     }
 
-    /**
-     * @param subscriber
-     */
     @Override
     public void addSubscriber(ISubscriber subscriber) {
         _publisher.addSubscriber(subscriber);
     }
 
-    /**
-     * @param subscriber
-     */
     @Override
     public void removeSubscriber(ISubscriber subscriber) {
         _publisher.removeSubscriber(subscriber);
     }
 
-    /**
-     * @param jsonObject
-     */
     @Override
     public void publish(JSONObject jsonObject) {
         _publisher.publish(jsonObject);

@@ -1,19 +1,30 @@
 package org.quazarspirit.holdem4j.game_logic.card_pile;
 
 import org.quazarspirit.holdem4j.game_logic.Card;
-import org.quazarspirit.holdem4j.game_logic.RankEvaluator;
-import org.quazarspirit.holdem4j.game_logic.Round;
-import org.quazarspirit.holdem4j.room_logic.Position;
+import org.quazarspirit.holdem4j.room_logic.POSITION;
+import org.quazarspirit.holdem4j.room_logic.PositionHandler;
 import org.quazarspirit.holdem4j.room_logic.Table;
-import org.quazarspirit.holdem4j.player_logic.IPlayer;
+import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 
 import java.util.ArrayList;
 
 public class Hand extends CardPile {
-    static protected int _maxSize = 5;
+    static protected final int _maxSize = 5;
     public enum HAND_RANK {
-        NONE, CARD_HIGH, PAIR, DOUBLE_PAIR, THREE_OF_A_KIND,
-        STRAIGHT, FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
+        NONE(-1), CARD_HIGH(0.9953015), PAIR(1.366477),
+        DOUBLE_PAIR(20.03535), THREE_OF_A_KIND(46.32955),
+        STRAIGHT(253.8), FLUSH(508.8019), FULL_HOUSE(693.1667),
+        FOUR_OF_A_KIND(4164), STRAIGHT_FLUSH(72192.33), ROYAL_FLUSH(649739);
+
+        private final double _probability;
+
+        HAND_RANK(double probability) {
+            _probability = probability;
+        }
+
+        public double getProbability() {
+            return _probability;
+        }
     }
     @Override
     public void init() {}
@@ -49,7 +60,7 @@ public class Hand extends CardPile {
         return hand;
     }
 
-    HAND_RANK computeRank(Table table, Position.NAME _name) {
+    HAND_RANK computeRank(Table table, POSITION _name) {
         Board board = table.getBoard();
         IPlayer player = table.getPlayerFromPosition(_name);
         ICardPile cardPile = table.getPocketCards(player);
@@ -61,9 +72,10 @@ public class Hand extends CardPile {
         PocketCards pocketCards = (PocketCards) cardPile;
 
         ArrayList<Card> combination = new ArrayList<Card>();
-        // WARNING value 5 is for Round:river
+        // WARNING value 5 is for BettingRound:river
         // NOT WORKING FOR OMAHA
-        int boardSize = Round.ROUND_CARD_COUNT.get(table.getRound().getRoundPhase());
+        /* TODO: Implements
+        int boardSize = BettingRound.ROUND_CARD_COUNT.get(table.getRound().getPhase());
 
         // Compute board alone
         HAND_RANK currentRank = RankEvaluator.evaluate(createHand(board)).getKey();
@@ -80,7 +92,7 @@ public class Hand extends CardPile {
                 RankEvaluator.evaluate(tmp_hand);
             }
         }
-
+        */
         return HAND_RANK.NONE;
     }
 }

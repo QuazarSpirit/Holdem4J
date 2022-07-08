@@ -3,6 +3,7 @@ package org.quazarspirit.utils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Utils {
     public static Class<?> getCallerClass() {
@@ -32,5 +33,23 @@ public class Utils {
 
     public static boolean isTesting() {
         return (System.getProperty("TEST") != null && System.getProperty("TEST").equals("true"));
+    }
+
+    public static class CircularArrayList<E> extends ArrayList<E> {
+        public CircularArrayList(ArrayList<E> arrayList) {
+            super(arrayList);
+        }
+
+        public CircularArrayList() {
+            super();
+        }
+        public E get(int index) {
+            int i = index % size();
+            if (i == -1) {
+                i = size() - 1;
+            }
+
+            return super.get(i);
+        }
     }
 }

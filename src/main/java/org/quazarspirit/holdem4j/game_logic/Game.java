@@ -1,5 +1,8 @@
 package org.quazarspirit.holdem4j.game_logic;
 
+import org.quazarspirit.holdem4j.game_logic.chip_pile.Chip;
+import org.quazarspirit.holdem4j.room_logic.Table;
+
 /**
  * Structured object for better handling of rules
  */
@@ -53,16 +56,38 @@ public class Game {
         MIXED, REAL, AI
     }
 
+    public enum FORMAT {
+        CASHGAME, SIT_AND_GO, SPIN_AND_PLAY, TOURNAMENT;
+        public boolean canStart(Table table) {
+            if (this == CASHGAME) {
+                return table.getPlayerCount() >= 2;
+            } else if (this == TOURNAMENT) {
+                // TODO: Implements prize pool
+                return table.getPlayerCount() == table.getGame().getMaxSeatsCount();
+            }
+            else {
+                return table.getPlayerCount() == table.getGame().getMaxSeatsCount();
+            }
+        }
+    }
+
     private PLAYER_TYPE _player_type = PLAYER_TYPE.MIXED;
     private BET_STRUCTURE _bet_structure = BET_STRUCTURE.NO_LIMIT;
     private VARIANT _variant = VARIANT.TEXAS_HOLDEM;
 
     private RANK_VARIANT _subVariant = RANK_VARIANT.HIGH;
+
+    private FORMAT _format = FORMAT.CASHGAME;
+
     private MAX_SEATS _maxSeatsName = MAX_SEATS.FULL_RING;
     private int _maxStackSize = 100;
     private int _minStackSize;
+
+    private Chip _unit;
+
     public Game() {
         setStackSize(_maxStackSize);
+        _unit = new Chip(this);
     }
     public Game(VARIANT variant, BET_STRUCTURE bet_structure) {
         _bet_structure = bet_structure;
@@ -92,9 +117,12 @@ public class Game {
     }
     public BET_STRUCTURE getBetStructure() { return _bet_structure; }
     public VARIANT getGameVariant() { return _variant; }
+    public FORMAT getFormat() { return _format; }
     public PLAYER_TYPE getPlayerType() { return _player_type; }
     public int getBB() { return _maxStackSize / 100; }
-    public int getMaxPlayerCount() { return _maxSeatsName.toInt(); }
+    public Chip getUnit() { return _unit; }
+    public int getMaxStackSize() { return _maxStackSize; }
+    public int getMaxSeatsCount() { return _maxSeatsName.toInt(); }
     public String asString() {
         return   _variant.toString() + " " +
                 _bet_structure.toString() + " " +
