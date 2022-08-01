@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.quazarspirit.utils.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -26,7 +27,7 @@ public class NetworkLogic extends Thread{
     }
 
     public void run() {
-        System.out.println("UDP Server is listening on port: " + _port);
+        Utils.Log("UDP Server is listening on port: " + _port);
         running = true;
 
         while (running) {
@@ -42,7 +43,7 @@ public class NetworkLogic extends Thread{
             packet = new DatagramPacket(buf, packet.getLength(), address, port);
             String received = new String(packet.getData(), packet.getOffset(), packet.getLength());
 
-            System.out.println(received);
+            Utils.Log(received);
 
             /*
             try {

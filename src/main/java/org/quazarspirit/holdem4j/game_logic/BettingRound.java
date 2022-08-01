@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j.game_logic;
 
 import org.quazarspirit.holdem4j.room_logic.POSITION;
+import org.quazarspirit.utils.Utils;
 import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
 import org.quazarspirit.utils.publisher_subscriber_pattern.IEventType;
 import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
@@ -60,14 +61,14 @@ public class BettingRound implements ISubscriber {
      * Used for testing purpose and when all players fold before showdown
      */
     private void reset() {
-        System.out.println("Betting round reset");
+        Utils.Log("Betting round reset");
         _roundPhase = PHASE.STASIS;
     }
 
     private void nextPhase() {
 
         _roundPhase = _roundPhase.getNext();
-        System.out.println("Betting round next " + _roundPhase);
+        Utils.Log("Betting round next " + _roundPhase);
     }
 
     public PHASE getPhase() {

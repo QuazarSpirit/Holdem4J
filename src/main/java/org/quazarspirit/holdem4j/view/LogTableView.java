@@ -6,6 +6,7 @@ import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_INTENT;
 import org.quazarspirit.holdem4j.room_logic.ITable;
 import org.quazarspirit.holdem4j.room_logic.POSITION;
 import org.quazarspirit.holdem4j.room_logic.PositionHandler;
+import org.quazarspirit.utils.Utils;
 import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
 
 import java.util.ArrayList;
@@ -17,13 +18,13 @@ public class LogTableView implements ITableView{
      */
     @Override
     public void update(Event event) {
-        // System.out.println("Source: " + event.source + "\n data: " + event.data);
+        // Utils.Log("Source: " + event.source + "\n data: " + event.data);
 
         ITable table = (ITable) event.source;
-        System.out.println("Event: " + event.data.get("type"));
+        Utils.Log("Event: " + event.data.get("type"), Utils.LOG_LEVEL.DEBUG);
         Object eventDataType = event.data.get("type");
         if (eventDataType == PLAYER_INTENT.JOIN || eventDataType == PLAYER_INTENT.LEAVE) {
-            //System.out.println("Game: " + table.getGame().asString() +
+            //Utils.Log("Game: " + table.getGame().asString() +
             //                   " Player count: " + table.getPlayerCount());
         } else if (eventDataType == BettingRound.EVENT.NEXT) {
             if(table.getRound().getPhase() != BettingRound.PHASE.STASIS) {
@@ -33,7 +34,7 @@ public class LogTableView implements ITableView{
                 for(Iterator<POSITION> iterator = playingPosition.iterator(); iterator.hasNext();) {
                     POSITION positionName = iterator.next();
                     IPlayer player = table.getPlayerFromPosition(positionName);
-                    System.out.println("PositionHandler: " + positionName +
+                    Utils.Log("PositionHandler: " + positionName +
                             " " + table.getPocketCards(player).asString());
                 }
 

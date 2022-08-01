@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j.game_logic;
 
 import org.junit.jupiter.api.Test;
+import org.quazarspirit.holdem4j.TestLifecycle;
 import org.quazarspirit.holdem4j.game_logic.card_pile.CardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Deck;
 
@@ -9,7 +10,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DeckTest {
+class DeckTest extends TestLifecycle {
 
     Pattern compileRegEx(String cardRange) {
         String regEx = "^(" + cardRange + "){4}$";

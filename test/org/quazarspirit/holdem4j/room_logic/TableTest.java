@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j.room_logic;
 
 import org.junit.jupiter.api.Test;
+import org.quazarspirit.holdem4j.TestLifecycle;
 import org.quazarspirit.holdem4j.game_logic.Game;
 import org.quazarspirit.holdem4j.game_logic.BettingRound;
 import org.quazarspirit.holdem4j.game_logic.card_pile.ICardPile;
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TableTest {
+public class TableTest extends TestLifecycle {
     public static final Game testGame = new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, 100, Game.MAX_SEATS.FULL_RING);
 
     TableTest() {
@@ -34,9 +35,9 @@ public class TableTest {
             iPlayers.add(bot);
         }
 
-        //System.out.println("Count: " + count + " table count: " + table.getPlayerCount());
-        //System.out.println(table.getRound().getPhase() + " " + table.isOpened);
-        //System.out.println(table + " " + iPlayers);
+        //Utils.Log("Count: " + count + " table count: " + table.getPlayerCount());
+        //Utils.Log(table.getRound().getPhase() + " " + table.isOpened);
+        //Utils.Log(table + " " + iPlayers);
 
         return table;
     }

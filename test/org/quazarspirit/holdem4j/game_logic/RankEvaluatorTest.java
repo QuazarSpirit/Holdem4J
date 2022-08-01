@@ -1,10 +1,12 @@
 package org.quazarspirit.holdem4j.game_logic;
 
 import org.junit.jupiter.api.Test;
+import org.quazarspirit.holdem4j.TestLifecycle;
 import org.quazarspirit.holdem4j.game_logic.card_pile.CardPile;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Deck;
 import org.quazarspirit.holdem4j.game_logic.card_pile.Hand;
 import org.quazarspirit.utils.ImmutableKV;
+import org.quazarspirit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +16,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RankEvaluatorTest {
+public class RankEvaluatorTest extends TestLifecycle {
     public static Deck deckFromString(String str) {
         Deck deck = new Deck();
         deck.clear();
@@ -74,7 +76,7 @@ public class RankEvaluatorTest {
     void evaluateRoyalFlush() {
         Deck deck = new Deck();
         deck.init("TJQKA");
-        System.out.println(deck.asString());
+        Utils.Log(deck.asString());
         ArrayList<Hand> handList = genStraightHands(deck, 8);
 
         for(Hand hand: handList){
@@ -301,7 +303,7 @@ public class RankEvaluatorTest {
                 String newRANKS = Card.RANKS;
                 newRANKS = newRANKS.replace("" + Card.RANKS.charAt(i), "");
                 newRANKS = newRANKS.replace("" + Card.RANKS.charAt(j), "");
-                // System.out.println(Card.RANKS.charAt(i) + " " + Card.RANKS.charAt(j) + " " + newRANKS);
+                // Utils.Log(Card.RANKS.charAt(i) + " " + Card.RANKS.charAt(j) + " " + newRANKS);
 
                 Random rd = new Random();
                 int randInt = rd.nextInt(newRANKS.length() - 1);
@@ -351,7 +353,7 @@ public class RankEvaluatorTest {
         for(int i = 0; i < handList.size(); i+=1) {
             Hand hand = handList.get(i).getKey();
             Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
-            System.out.println(hand.asString());
+            Utils.Log(hand.asString());
 
             assertEquals(Hand.HAND_RANK.PAIR, eval.getKey());
             assertEquals(eval.getValue().highnessAsString(), handList.get(i).getValue());
@@ -384,7 +386,7 @@ public class RankEvaluatorTest {
 
         for (Hand hand: handList) {
             Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
-            System.out.println(hand.asString());
+            Utils.Log(hand.asString());
             if (eval.getKey() != Hand.HAND_RANK.STRAIGHT) {
                 assertEquals(eval.getKey(), Hand.HAND_RANK.CARD_HIGH);
 
@@ -406,7 +408,7 @@ public class RankEvaluatorTest {
         hand.pushCard(new Card("Ad"));
 
         Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
-        System.out.println(hand.asString());
+        Utils.Log(hand.asString());
         assertEquals(eval.getKey(), Hand.HAND_RANK.PAIR);
 
         Hand newHand = new Hand(hand);
@@ -424,7 +426,7 @@ public class RankEvaluatorTest {
         hand.pushCard(new Card("7d"));
 
         Map.Entry<Hand.HAND_RANK, HandRankInfo> eval = RankEvaluator.evaluate(hand);
-        System.out.println(hand.asString());
+        Utils.Log(hand.asString());
         assertEquals(eval.getKey(), Hand.HAND_RANK.CARD_HIGH);
 
         Hand newHand = new Hand(hand);

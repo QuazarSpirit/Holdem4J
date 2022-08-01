@@ -52,17 +52,20 @@ public class Dealer /*extends Thread*/ implements ISubscriber, IPublisher {
     }
 
     public void playRoundPhase() {
-        if (!canStart() && ! Utils.isTesting()) { System.out.println("Dealer can't start"); return; }
+        if (!canStart() && ! Utils.IsTesting()) { Utils.Log("Dealer can't start"); return; }
         _roundPhase = _table.getRound().getPhase();
-        //System.out.println(_roundPhase.toString());
+        //Utils.Log(_roundPhase.toString());
 
         switch(_roundPhase) {
             case STASIS -> { return; }
             case PRE_FLOP -> {
                 _deck = new Deck(_table.getGame());
-                if(!Utils.isTesting()) {
+                if(!Utils.IsTesting()) {
                     _deck = _deck.shuffle();
-                    System.out.println("New deck: " + _deck.asString());
+                    Utils.Log(
+                            "New deck: " + _deck.asString(),
+                            new ImmutableKV<String, Object>("type", "GAME")
+                    );
                 }
 
                 _table.getPot().add(_table.blindBet());
@@ -78,7 +81,7 @@ public class Dealer /*extends Thread*/ implements ISubscriber, IPublisher {
         _currPlayingPos = _table.getPlayingPositions();
 
         // Send query action event to first player
-        if (! Utils.isTesting()) {
+        if (! Utils.IsTesting()) {
             sendQueryActionEvent(_currPlayingPos.get(0), _previousPlayerActions);
         }
 
@@ -211,8 +214,15 @@ public class Dealer /*extends Thread*/ implements ISubscriber, IPublisher {
         ArrayList<POSITION> playingPositions = _table.getPlayingPositions();
         HashMap<POSITION, PocketCards> pocketCardsList = new HashMap<>();
 
-        System.out.println("----------- \nPlaying positions count: " + playingPositions.size());
-        System.out.println("Playing positions: " + playingPositions);
+        Utils.Log(
+                "----------- \nPlaying positions count: " + playingPositions.size(),
+                new ImmutableKV<String, Object>("message_type", "GAME")
+        );
+
+        Utils.Log(
+                "Playing positions: " + playingPositions,
+                new ImmutableKV<String, Object>("message_type", "GAME")
+        );
 
         for (POSITION positionName : playingPositions) {
             pocketCardsList.put(positionName, new PocketCards());
@@ -302,7 +312,7 @@ public class Dealer /*extends Thread*/ implements ISubscriber, IPublisher {
 
         if (eventType == PLAYER_INTENT.JOIN) {
             if (canStart()) {
-                if(!Utils.isTesting()) {
+                if(!Utils.IsTesting()) {
                     if(_table.getRound().getPhase() == BettingRound.PHASE.STASIS) {
                         //TODO:  SEND EVENT TO TABLE
                         _table.nextBettingRoundPhase();
@@ -317,7 +327,7 @@ public class Dealer /*extends Thread*/ implements ISubscriber, IPublisher {
         }
         else if (eventType == BettingRound.EVENT.NEXT) {
             if(_table.getRound().getPhase() != BettingRound.PHASE.STASIS) {
-                if(!Utils.isTesting()) {
+                if(!Utils.IsTesting()) {
                     playRoundPhase();
                 }
             }

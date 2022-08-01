@@ -3,6 +3,8 @@ package org.quazarspirit.holdem4j.rules.hand_rank;
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rule;
 import org.jeasy.rules.core.RuleBuilder;
+import org.quazarspirit.utils.Utils;
+
 import static org.quazarspirit.holdem4j.rules.hand_rank.conditions.PairCondition.isPair;
 
 public abstract class RankRule {
@@ -21,7 +23,7 @@ public abstract class RankRule {
                 // CONDITION
             .when(isPair())
                 // ACTION
-            .then(facts -> System.out.println("It is a pair!"))
+            .then(facts -> Utils.Log("It is a pair!"))
             .build();
 
         Rule doublePairRule = new RuleBuilder()
@@ -31,7 +33,7 @@ public abstract class RankRule {
                 // CONDITION
                 .when(isPair())
                 // ACTION
-                .then(facts -> System.out.println("It is a pair!"))
+                .then(facts -> Utils.Log("It is a pair!"))
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.quazarspirit.utils.Utils;
 import org.quazarspirit.utils.publisher_subscriber_pattern.Publisher;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ class PositionHandlerTest extends Publisher {
         final int maxTableSize = 10;
 
         for(int currentPlayerCount = 0; currentPlayerCount < maxTableSize; currentPlayerCount++) {
-            System.out.println("++++++++++++++++++++++++++\n" + currentPlayerCount + " " + maxTableSize);
+            Utils.Log("++++++++++++++++++++++++++\n" + currentPlayerCount + " " + maxTableSize);
             PositionHandler p = new PositionHandler();
             this.addSubscriber(p);
             sendAllocateEvent(maxTableSize, currentPlayerCount);
@@ -68,13 +69,13 @@ class PositionHandlerTest extends Publisher {
 
             for(int i = currentPlayerCount; i < FP_ORDER_LENGTH; i++) {
                 int fp_count = p.getFreeCount();
-                System.out.println("-----------------\n" + "Free positions count: " + fp_count + " current player count: " + i);
+                Utils.Log("-----------------\n" + "Free positions count: " + fp_count + " current player count: " + i);
 
                 assertEquals(fp_count, FP_ORDER_LENGTH - i);
                 assertEquals(fp_count, FP_ORDER_LENGTH - i);
                 POSITION pName = p.pickFree();
 
-                System.out.println(pName + " ");
+                Utils.Log(pName + " ");
                 assertEquals(POSITION.PRIORITY_ORDER[i], pName);
             }
             this.removeSubscriber(p);

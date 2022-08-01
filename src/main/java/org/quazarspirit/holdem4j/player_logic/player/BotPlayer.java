@@ -21,9 +21,6 @@ public class BotPlayer extends Player {
         super(uuid, username);
     }
 
-    /**
-     * @param event
-     */
     @Override
     public void update(Event event) {
         JSONObject eventData = event.data;

@@ -6,6 +6,7 @@ import org.jeasy.rules.api.RulesEngine;
 import org.jeasy.rules.core.DefaultRulesEngine;
 import org.jeasy.rules.mvel.MVELRuleFactory;
 import org.jeasy.rules.support.reader.YamlRuleDefinitionReader;
+import org.quazarspirit.utils.Utils;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class RuleEngine {
         //create a default rules engine and fire rules on known facts
         RulesEngine rulesEngine = new DefaultRulesEngine();
 
-        System.out.println("Tom: Hi! can I have some Vodka please?");
+        Utils.Log("Tom: Hi! can I have some Vodka please?");
         rulesEngine.fire(alcoholRules, facts);
         rulesEngine.fire(nameRules, facts);
     }

@@ -24,12 +24,12 @@ public class PositionHandler implements ISubscriber {
      */
     @Override
     public void update(Event event) {
-        //System.out.println("Got event");
+        //Utils.Log("Got event");
 
         if(event.data.get("type")  == EVENT.ALLOCATE) {
             int max_seat_count = (int) event.data.get("max_seat_count");
             int playerCount = (int) event.data.get("player_count");
-            //System.out.println(max_seat_count + " " + playerCount);
+            //Utils.Log(max_seat_count + " " + playerCount);
             allocate(max_seat_count, playerCount);
         }
     }
@@ -62,7 +62,7 @@ public class PositionHandler implements ISubscriber {
 
         if (_used_positions.contains(freePos)) {
             // Means that position name is already picked
-            System.out.println("position name is already picked");
+            Utils.Log("position name is already picked");
             return POSITION.NONE;
         }
         _free_positions.remove(freePos);

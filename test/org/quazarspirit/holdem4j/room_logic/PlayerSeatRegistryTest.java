@@ -1,10 +1,11 @@
 package org.quazarspirit.holdem4j.room_logic;
 
 import org.junit.jupiter.api.Test;
-import org.quazarspirit.holdem4j.game_logic.BettingRound;
+import org.quazarspirit.holdem4j.TestLifecycle;
 import org.quazarspirit.holdem4j.player_logic.player.BotPlayer;
 import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 import org.quazarspirit.holdem4j.player_logic.player_seat.IPlayerSeat;
+import org.quazarspirit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PlayerSeatRegistryTest {
+class PlayerSeatRegistryTest extends TestLifecycle {
 
     PlayerSeatRegistryTest() {
         System.setProperty("TEST", "true");
@@ -22,7 +23,7 @@ class PlayerSeatRegistryTest {
     void constructor() {
         PlayerSeatRegistry registry = new PlayerSeatRegistry(TableTest.testGame);
         assertEquals(TableTest.testGame.getMaxSeatsCount(), registry.getPlayersSeat().size());
-        System.out.println(registry.asString());
+        Utils.Log(registry.asString());
 
     }
 
@@ -37,9 +38,26 @@ class PlayerSeatRegistryTest {
             assertEquals(bot, registry.getPlayersSeat().get(i).getKey());
         }
 
-        System.out.println(registry.asString());
+        Utils.Log(registry.asString());
     }
 
+    @Test
+    void addPlayersOnFullTable() {
+        PlayerSeatRegistry registry = new PlayerSeatRegistry(TableTest.testGame);
+
+        for (int i = 0; i < TableTest.testGame.getMaxSeatsCount(); i += 1) {
+            IPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-" + i);
+            assertTrue(registry.add(bot));
+
+            assertEquals(bot, registry.getPlayersSeat().get(i).getKey());
+        }
+
+        IPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-beyond");
+        assertFalse(registry.add(bot));
+
+
+        Utils.Log(registry.asString());
+    }
 
     @Test
     void removeOneRandomPlayer() {
@@ -57,8 +75,35 @@ class PlayerSeatRegistryTest {
 
             IPlayer randomPlayer = players.get(rand.nextInt(players.size() - 1));
             assertTrue(registry.remove(randomPlayer));
-            System.out.println(registry.asString());
+            Utils.Log(registry.asString());
         }
+    }
+
+    @Test
+    void removeUnknownPlayer() {
+        PlayerSeatRegistry registry = new PlayerSeatRegistry(TableTest.testGame);
+        for (int i = 0; i < TableTest.testGame.getMaxSeatsCount(); i += 1) {
+            IPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-" + i);
+            assertTrue(registry.add(bot));
+
+            assertEquals(bot, registry.getPlayersSeat().get(i).getKey());
+        }
+
+        IPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-unknown");
+        assertFalse(registry.remove(bot));
+
+        Utils.Log(registry.asString());
+    }
+
+    @Test
+    void removePlayerOnEmptyTable() {
+        PlayerSeatRegistry registry = new PlayerSeatRegistry(TableTest.testGame);
+
+        IPlayer bot = new BotPlayer(UUID.randomUUID(), "Bot-beyond");
+        assertFalse(registry.remove(bot));
+
+
+        Utils.Log(registry.asString());
     }
 
     @Test
@@ -76,7 +121,7 @@ class PlayerSeatRegistryTest {
 
             IPlayer randomPlayer = players.get(rand.nextInt(players.size() - 1));
             assertTrue(registry.remove(randomPlayer));
-            System.out.println(registry.asString());
+            Utils.Log(registry.asString());
         }
     }
 
@@ -95,13 +140,12 @@ class PlayerSeatRegistryTest {
                 assertEquals(playerSeat.getPosition(), registry._positionHandler.getUsed().get(i));
             }
 
-            //System.out.println(registry.asString());
+            //Utils.Log(registry.asString());
         }
     }
 
     @Test
     public void bindPositionsForMultipleTableRounds() {
-        //int k = 5;
         for (int k = 0; k < TableTest.testGame.getMaxSeatsCount(); k += 1) {
         ArrayList<IPlayer> players = new ArrayList<>();
         Table table = TableTest.initTableWithPlayers(players, k, TableTest.testGame, false);
@@ -118,8 +162,8 @@ class PlayerSeatRegistryTest {
 
                     table.resetBettingRoundPhase();
                     table.nextBettingRoundPhase();
-                    System.out.println(table._tableRoundCounter);
-                    System.out.println("---------------------------\n" + registry.asString(PlayerSeatRegistry.FILTER.BOUND_SEAT));
+                    //Utils.Log(table._tableRoundCounter);
+                    //Utils.Log("---------------------------\n" + registry.asString(PlayerSeatRegistry.FILTER.BOUND_SEAT));
 
             }
         }

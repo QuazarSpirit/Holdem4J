@@ -4,6 +4,7 @@ import org.quazarspirit.holdem4j.game_logic.Game;
 import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_INTENT;
 import org.quazarspirit.holdem4j.view.LogTableView;
+import org.quazarspirit.utils.Utils;
 import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
 import org.quazarspirit.utils.publisher_subscriber_pattern.IEventType;
 import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
@@ -121,7 +122,7 @@ public class Lobby implements ISubscriber {
                 }
             }
             else {
-                System.out.println("Lobby game to table hashmap DOES NOT contains specified game");
+                Utils.Log("Lobby game to table hashmap DOES NOT contains specified game");
             }
         }
         return null;

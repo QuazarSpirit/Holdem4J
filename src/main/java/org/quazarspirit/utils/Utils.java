@@ -1,12 +1,30 @@
 package org.quazarspirit.utils;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.quazarspirit.utils.logger.SimpleLogger;
+import org.quazarspirit.utils.logger.TCPLogger;
+import org.quazarspirit.utils.publisher_subscriber_pattern.Publisher;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Utils {
-    public static Class<?> getCallerClass() {
+    public enum EVENT {
+        LOG
+    }
+    public enum LOG_LEVEL {
+        MESSAGE, INFO, DEBUG, WARNING, ERROR
+    }
+
+    private static LogSource logSource = new LogSource();
+
+    private static boolean envLoaded = false;
+
+    public static Class<?> GetCallerClass() {
         final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         String clazzName = stackTrace[4].getClassName();
         try {
@@ -17,7 +35,7 @@ public class Utils {
         }
     }
 
-    public static String readFileAsString(String filePath) throws IOException {
+    public static String ReadFileAsString(String filePath) throws IOException {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = new BufferedReader(
                 new FileReader(filePath));
@@ -31,7 +49,7 @@ public class Utils {
         return fileData.toString();
     }
 
-    public static boolean isTesting() {
+    public static boolean IsTesting() {
         return (System.getProperty("TEST") != null && System.getProperty("TEST").equals("true"));
     }
 
@@ -51,5 +69,70 @@ public class Utils {
 
             return super.get(i);
         }
+    }
+
+    static class LogSource extends Publisher {
+
+        LogSource() {
+            createLoggers();
+        }
+        private void createLoggers() {
+            SimpleLogger simpleLogger = new SimpleLogger();
+            this.addSubscriber(simpleLogger);
+            TCPLogger wssLogger = TCPLogger.GetSingleton();
+            this.addSubscriber(wssLogger);
+        }
+
+        public void log(Object message) {
+            if (message instanceof JSONObject json) {
+                if (json.has("type")) {
+                    publish(json);
+                    return;
+                }
+            }
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("type", EVENT.LOG);
+            jsonObject.put("message", message);
+            publish(jsonObject);
+        }
+    }
+
+    public static void Log(Object arg) {
+        logSource.log(arg);
+    }
+
+    public static void Log(String message, Map.Entry<String, Object> ...args) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("message", message);
+        Arrays.stream(args).forEach(arg -> {
+            jsonObject.put(arg.getKey(), arg.getValue());
+        });
+        logSource.log(jsonObject);
+    }
+
+    public static void Log(Object arg, LOG_LEVEL log_level) {
+        if (! IsTesting() && log_level == LOG_LEVEL.DEBUG) {
+            return;
+        }
+
+        logSource.log(arg);
+    }
+
+    private static void LoadEnv() {
+        if (! envLoaded) {
+            Dotenv.configure().systemProperties().load();
+            envLoaded = true;
+        }
+    }
+
+    public static Object GetEnv(String key, Object defaultValue) {
+        LoadEnv();
+        Object property  = System.getProperty(key);
+        if (property != null) {
+            return property;
+        }
+
+        return defaultValue;
     }
 }

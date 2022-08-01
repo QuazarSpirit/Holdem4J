@@ -2,6 +2,7 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.json.JSONObject;
 import org.quazarspirit.utils.ImmutableKV;
+import org.quazarspirit.utils.Utils;
 import org.quazarspirit.utils.publisher_subscriber_pattern.*;
 import org.quazarspirit.holdem4j.game_logic.Game;
 import org.quazarspirit.holdem4j.game_logic.BettingRound;
@@ -40,13 +41,11 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     protected HashMap<IPlayer, Stack> playersStack = new HashMap<>();
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
-    final private ArrayList<ImmutableKV<IPlayer, PLAYER_INTENT>> _waitingPlayers = new ArrayList<>();
     final private Dealer _dealer;
     final private BettingRound _bettingRound = new BettingRound();
     final private Board _board = new Board();
-    //final private PositionHandler _positionHandler;
     final private Pot _pot;
-    final private Game _game; // = new Game(Game.VARIANT.HOLDEM, Game.BET_STRUCTURE.NO_LIMIT);
+    final private Game _game;
 
     final private Publisher _publisher = new Publisher(this);
     public Table(Game game) {
@@ -65,7 +64,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     // TODO: Test with multiple complete rounds
     public void nextBettingRoundPhase() {
-        System.out.println("------------\nCurrent phase: " + _bettingRound.getPhase().toString());
+        //Utils.Log("------------\nCurrent phase: " + _bettingRound.getPhase().toString());
         ///_bettingRound.nextPhase();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", BettingRound.EVENT.NEXT);
@@ -73,7 +72,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         publish(jsonObject);
 
         BettingRound.PHASE roundPhase = _bettingRound.getPhase();
-        System.out.println( _bettingRound.getPhase());
+        Utils.Log( _bettingRound.getPhase());
 
         if (roundPhase == BettingRound.PHASE.STASIS) {
             // Manage waiting players
@@ -81,18 +80,11 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             // Update player seat
             updatePlayerSeat();
         } else if (roundPhase == BettingRound.PHASE.PRE_FLOP) {
-            System.out.println("Je passe ici");
             _tableRoundCounter+=1;
 
             updatePlayerPositions();
 
         }
-        /*
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", BettingRound.EVENT.NEXT);
-        jsonObject.put("round_phase", _bettingRound.getPhase().getNext());
-        publish(jsonObject);
-         */
     }
 
     public void resetBettingRoundPhase() {
@@ -108,7 +100,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     }
 
     public void updatePlayerPositions() {
-        System.out.println("Updating player positions");
+        //Utils.Log("Updating player positions");
 
         JSONObject bindPositionToSeatEventData = new JSONObject();
         bindPositionToSeatEventData.put("type", PlayerSeatRegistry.EVENT.BIND);
@@ -118,7 +110,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     public void updatePlayerSeat() {
         /* TODO: Debug
-        System.out.println("Updating player positions");
+        Utils.Log("Updating player positions");
         // Loop over player seats and update their position names
         PositionHandler previousPositionHandler;
 
@@ -137,7 +129,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     }
 
     public void manageWaitingPlayers() {
-        System.out.println("Managing waiting players");
+        //Utils.Log("Managing waiting players");
 
         // Make player leave / join if they want to
     }
@@ -212,19 +204,12 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
 
         if (_bettingRound.getPhase() == BettingRound.PHASE.STASIS) {
-            /**
-             * @Deprecated use PlayerSeatRegistry instead
-             */
-            /*
-            POSITION freePosition = _positionHandler.pickFree();
-            players.put(freePosition, player);
-            */
             _playerSeats.add(player);
 
             _dealer.addSubscriber(player);
             player.addSubscriber(_dealer);
         } else {
-            _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.JOIN));
+            //_waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.JOIN));
         }
 
         playersPocketCard.put(player, new PocketCards());
@@ -255,7 +240,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             // TODO: Move to PlayerSeatRegistry.Update()
             //_positionHandler.releaseUsed(positionToRemove);
         } else {
-            _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.LEAVE));
+            //_waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player, PLAYER_INTENT.LEAVE));
         }
 
         JSONObject jsonObject = new JSONObject();

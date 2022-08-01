@@ -8,14 +8,14 @@ public class WebTableView implements ITableView{
      */
     @Override
     public void update(Event event) {
-        // System.out.println("Source: " + event.source + "\n data: " + event.data);
+        // Utils.Log("Source: " + event.source + "\n data: " + event.data);
             /*
         ITable table = (ITable) event.source;
         StringBuilder HTML_data = new StringBuilder("<html><body>");
-        System.out.println("Event: " + event.data.get("type"));
+        Utils.Log("Event: " + event.data.get("type"));
         Object eventDataType = event.data.get("type");
         if (eventDataType == PLAYER_INTENT.JOIN || eventDataType == PLAYER_INTENT.LEAVE) {
-            //System.out.println("Game: " + table.getGame().asString() +
+            //Utils.Log("Game: " + table.getGame().asString() +
             //                   " Player count: " + table.getPlayerCount());
             int player_count = table.getPlayerCount();
             HTML_data.append("<table>");
@@ -31,7 +31,7 @@ public class WebTableView implements ITableView{
                 for(Iterator<PositionHandler.POSITION> iterator = playingPosition.iterator(); iterator.hasNext();) {
                     PositionHandler.POSITION positionName = iterator.next();
                     IPlayer player = table.getPlayerFromPosition(positionName);
-                    System.out.println("PositionHandler: " + positionName +
+                    Utils.Log("PositionHandler: " + positionName +
                             " " + table.getPocketCards(player).asString());
                 }
 

@@ -2,10 +2,11 @@ package org.quazarspirit.holdem4j.game_logic;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.quazarspirit.holdem4j.TestLifecycle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CardTest {
+class CardTest extends TestLifecycle {
     @Test
     void constructWithCorrectValue() {
         final String value = "2c";

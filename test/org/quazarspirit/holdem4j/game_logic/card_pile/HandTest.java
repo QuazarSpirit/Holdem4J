@@ -1,11 +1,13 @@
 package org.quazarspirit.holdem4j.game_logic.card_pile;
 
 import org.junit.jupiter.api.Test;
+import org.quazarspirit.holdem4j.TestLifecycle;
 import org.quazarspirit.holdem4j.game_logic.Card;
+import org.quazarspirit.utils.Utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HandTest {
+class HandTest extends TestLifecycle {
     @Test
     void sortRank() {
         Hand hand = new Hand();
@@ -13,10 +15,10 @@ class HandTest {
         for(int i = 0; i < hand.getMaxSize(); i++) {
             hand.pushCard(deck.getCardAt(i));
         }
-        System.out.println("Rank: " + hand.asString(CardPile.SORT_CRITERIA.RANK));
+        Utils.Log("Rank: " + hand.asString(CardPile.SORT_CRITERIA.RANK));
 
         hand.sort(CardPile.SORT_CRITERIA.RANK);
-        System.out.println(hand.asString(CardPile.SORT_CRITERIA.RANK) + "\n -------");
+        Utils.Log(hand.asString(CardPile.SORT_CRITERIA.RANK) + "\n -------");
 
         assertTrue(hand.isSorted(CardPile.SORT_CRITERIA.RANK));
     }
@@ -28,10 +30,10 @@ class HandTest {
         for(int i = 0; i < hand.getMaxSize(); i++) {
             hand.pushCard(deck.getCardAt(i));
         }
-        System.out.println("Color: " + hand.asString(CardPile.SORT_CRITERIA.COLOR));
+        Utils.Log("Color: " + hand.asString(CardPile.SORT_CRITERIA.COLOR));
 
         hand.sort(CardPile.SORT_CRITERIA.COLOR);
-        System.out.println(hand.asString(CardPile.SORT_CRITERIA.COLOR) + "\n --------");
+        Utils.Log(hand.asString(CardPile.SORT_CRITERIA.COLOR) + "\n --------");
 
         assertTrue(hand.isSorted(CardPile.SORT_CRITERIA.COLOR));
     }

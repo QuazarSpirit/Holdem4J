@@ -2,6 +2,7 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.json.JSONObject;
 import org.quazarspirit.holdem4j.game_logic.Game;
+import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_INTENT;
 import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 import org.quazarspirit.holdem4j.player_logic.player.NullPlayer;
 import org.quazarspirit.holdem4j.player_logic.player_seat.IPlayerSeat;
@@ -15,8 +16,6 @@ import org.quazarspirit.utils.publisher_subscriber_pattern.Publisher;
 
 import java.util.*;
 
-// TODO: UNIT TEST PLS PLS PLS ITS IMPORTANT
-
 
 public class PlayerSeatRegistry extends Publisher implements ISubscriber {
     public enum EVENT implements IEventType {
@@ -28,6 +27,9 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
     }
 
     protected HashMap<Integer, ImmutableKV<IPlayer, IPlayerSeat>> playersSeat = new HashMap<>();
+
+    final private ArrayList<ImmutableKV<IPlayer, PLAYER_INTENT>> _waitingPlayers = new ArrayList<>();
+
     final static private ImmutableKV<IPlayer, IPlayerSeat> EMPTY_SEAT = new ImmutableKV<>((IPlayer) NullPlayer.GetSingleton(), (IPlayerSeat) NullPlayerSeat.GetSingleton());
 
     final private int _maxSeatCount;
@@ -88,7 +90,7 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
     }
 
     public void bindPositions(int tableRoundCount) {
-        //System.out.println("bindPositions: "  + size());
+        //Utils.Log("bindPositions: "  + size());
         if (size() == 0) {
             return;
         }
@@ -98,7 +100,7 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
         ArrayList<ImmutableKV<IPlayer, IPlayerSeat>> realPlayers = getRealPlayers();
 
         int shift = tableRoundCount % size();
-        //System.out.println("bindPositions shift : " + shift + " " + tableRoundCount);
+        //Utils.Log("bindPositions shift : " + shift + " " + tableRoundCount);
 
         for (int i = shift; i < size() + shift; i += 1) {
             int index = 0;
@@ -108,7 +110,7 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
                 index = i - size();
             }
             ImmutableKV<IPlayer, IPlayerSeat> kv = realPlayers.get(i - shift);
-            System.out.println(usedPos.get(index));
+            //Utils.Log(usedPos.get(index));
             kv.getValue().setPosition(usedPos.get(index));
         }
     }
@@ -142,7 +144,6 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
 
         for (int i = 0; i < sortedSeatIndexes.length; i += 1) {
             ImmutableKV<IPlayer, IPlayerSeat> kv = (ImmutableKV<IPlayer, IPlayerSeat>) sortedSeatIndexes[i];
-
         }
     }
 

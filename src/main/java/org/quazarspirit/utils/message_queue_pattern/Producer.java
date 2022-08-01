@@ -1,6 +1,7 @@
 package org.quazarspirit.utils.message_queue_pattern;
 
 import org.json.JSONObject;
+import org.quazarspirit.utils.Utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,10 +25,10 @@ public class Producer implements IProducer {
         try {
             HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             // print status code
-            System.out.println(response.statusCode());
+            Utils.Log(response.statusCode());
 
             // print response body
-            System.out.println(response.body());
+            Utils.Log(response.body());
         } catch (Exception e) {
             if (! e.getClass().getSimpleName().equals("ConnectException"))  {
                 e.printStackTrace();

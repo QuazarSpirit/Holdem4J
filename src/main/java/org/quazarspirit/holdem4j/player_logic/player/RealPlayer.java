@@ -8,12 +8,6 @@ public class RealPlayer extends Player{
     public RealPlayer(UUID uuid, String username) {
         super(uuid, username);
     }
-
-    /**
-     * @param event
-     */
     @Override
-    public void update(Event event) {
-
-    }
+    public void update(Event event) {}
 }

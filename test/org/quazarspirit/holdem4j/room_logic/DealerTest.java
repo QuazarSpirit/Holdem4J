@@ -2,12 +2,14 @@ package org.quazarspirit.holdem4j.room_logic;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.quazarspirit.holdem4j.TestLifecycle;
 import org.quazarspirit.holdem4j.game_logic.BettingRound;
 import org.quazarspirit.holdem4j.game_logic.Game;
 import org.quazarspirit.holdem4j.game_logic.card_pile.*;
 import org.quazarspirit.holdem4j.game_logic.chip_pile.NullBet;
 import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
 import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_ACTION;
+import org.quazarspirit.utils.Utils;
 import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
 import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
 
@@ -16,7 +18,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DealerTest {
+class DealerTest extends TestLifecycle {
     static final Game testGame = new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, Game.PLAYER_TYPE.AI);
 
     DealerTest() { System.setProperty("TEST", "true"); }
@@ -26,7 +28,7 @@ class DealerTest {
             IPlayer iPlayer = iPlayers.get(i);
             ICardPile pCards = table.getPocketCards(iPlayer);
 
-            System.out.println(pCards.asString());
+            Utils.Log(pCards.asString());
 
             if (!pCards.equals(NullCardPile.GetSingleton())) {
                 PocketCards pocketCards = (PocketCards) pCards;
@@ -190,7 +192,7 @@ class DealerTest {
 
         ArrayList<IPlayer> iPlayers = new ArrayList<>();
         Table table = TableTest.initTableWithPlayers(iPlayers, 10, testGame);
-        System.out.println(table);
+        Utils.Log(table);
         Dealer dealer = table.getDealer();
 
         JSONObject jsonObject_1 = new JSONObject();
@@ -198,17 +200,17 @@ class DealerTest {
         jsonObject_1.put("bet", NullBet.getSingleton());
         IPlayer botPlayer_1 = iPlayers.get(0);
 
-        System.out.println(table.getPlayingPositions());
+        Utils.Log(table.getPlayingPositions());
         dealer.handlePlayerAction(jsonObject_1, botPlayer_1);
-        System.out.println(table.getPlayingPositions());
+        Utils.Log(table.getPlayingPositions());
 
         JSONObject jsonObject2 = new JSONObject();
         jsonObject2.put("player_action", PLAYER_ACTION.BET);
         jsonObject2.put("bet", NullBet.getSingleton());
         IPlayer botPlayer_2 = iPlayers.get(2);
-        System.out.println(table.getPlayingPositions());
+        Utils.Log(table.getPlayingPositions());
         dealer.handlePlayerAction(jsonObject2, botPlayer_2);
-        System.out.println(table.getPlayingPositions());
+        Utils.Log(table.getPlayingPositions());
 
     }
 

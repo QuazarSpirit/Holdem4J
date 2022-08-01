@@ -9,7 +9,7 @@ Pre-condition:
     1.2 Player2 JOIN Table as Seat2
 
 2. Phase: PRE_FLOP
-    Positions: Seat1=SB Seat2=BB
+    PlayerSeatRegistry BIND POSITION: Seat1=SB Seat2=BB
     Dealer asks BLIND_BETS
     2.1 Deal step:
         2.1.1 Dealer DEAL POCKET_CARDS SB, BB
