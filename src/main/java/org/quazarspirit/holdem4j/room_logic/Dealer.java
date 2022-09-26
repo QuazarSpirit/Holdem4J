@@ -22,12 +22,12 @@ import java.net.URI;
 import java.util.*;
 
 /**
- * Class that shuffles and distributes cards
- * Draws board (flop, turn, river)
- * Handles hands
- * Handles bets, checks if blinds are paid
- * Handles rules in general
- * Computes pot size
+ * Class that shuffles and distributes cards.<br>
+ * Draws board (flop, turn, river).<br>
+ * Handle hands.<br>
+ * Handle bets, checks if blinds are paid.<br>
+ * Handle rules in general.<br>
+ * Computes pot size.
  */
 public class Dealer /*extends Thread*/ implements ISubscriber, IPublisher {
     private final URI MQ_Endpoint = URI.create("http://localhost:4000/message/add");

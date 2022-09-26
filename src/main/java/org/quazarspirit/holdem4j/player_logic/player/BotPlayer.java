@@ -17,6 +17,13 @@ import java.util.UUID;
  * Stays exclusively on server in same process
  */
 public class BotPlayer extends Player {
+    /**
+     * Create Bot player with Random UUID and defined username
+     * @param username String shown in client
+     */
+    public BotPlayer(String username) {
+        super(UUID.randomUUID(), username);
+    }
     public BotPlayer(UUID uuid, String username) {
         super(uuid, username);
     }

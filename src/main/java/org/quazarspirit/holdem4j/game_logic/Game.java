@@ -38,11 +38,9 @@ public class Game {
             return Card.RANKS;
         }
     }
-
     public enum RANK_VARIANT {
         HIGH, HIGH_LOW, LOW
     }
-
     public enum BET_STRUCTURE {
         FIXED_LIMIT, POT_LIMIT, NO_LIMIT
     }
@@ -55,7 +53,6 @@ public class Game {
     public enum PLAYER_TYPE {
         MIXED, REAL, AI
     }
-
     public enum FORMAT {
         CASHGAME, SIT_AND_GO, SPIN_AND_PLAY, TOURNAMENT;
         public boolean canStart(Table table) {
@@ -74,17 +71,23 @@ public class Game {
     private PLAYER_TYPE _player_type = PLAYER_TYPE.MIXED;
     private BET_STRUCTURE _bet_structure = BET_STRUCTURE.NO_LIMIT;
     private VARIANT _variant = VARIANT.TEXAS_HOLDEM;
-
     private RANK_VARIANT _subVariant = RANK_VARIANT.HIGH;
-
     private FORMAT _format = FORMAT.CASHGAME;
-
     private MAX_SEATS _maxSeatsName = MAX_SEATS.FULL_RING;
     private int _maxStackSize = 100;
     private int _minStackSize;
-
     private Chip _unit;
 
+    /**
+     * Create game instance with following structure:<br>
+     * <b>Player type:</b> Mixed<br>
+     * <b>Bet structure:</b> No Limit<br>
+     * <b>Variant:</b> Texas Holdem<br>
+     * <b>Sub variant:</b> HIGH<br>
+     * <b>Format:</b> Cash game<br>
+     * <b>Max seats:</b> Full ring<br>
+     * <b>Max stack size:</b> 100
+     */
     public Game() {
         setStackSize(_maxStackSize);
         _unit = new Chip(this);

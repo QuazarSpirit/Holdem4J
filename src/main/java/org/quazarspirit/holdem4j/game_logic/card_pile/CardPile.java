@@ -11,9 +11,19 @@ public abstract class CardPile implements ICardPile {
     public enum SORT_CRITERIA {
         RANK, COLOR, VALUE
     }
-    // TODO: Change by rules
-    static protected final int _maxSize = 52;
-    final protected ArrayList<Card> cards = new ArrayList<Card>();
+    private static int _maxSize = 52;
+    protected final ArrayList<Card> cards = new ArrayList<Card>();
+
+    CardPile() {}
+    CardPile(int deckMaxSize) {
+        _maxSize = deckMaxSize;
+    }
+
+    /**
+     * Returns if <b>VALUE</b> of given card is currently in card pile.
+     * @param cardToCheck Card to check, only using his value.
+     * @return If card is in card pile.
+     */
     @Override
     public boolean contains(Card cardToCheck) {
         for (Card card: cards) {
@@ -24,13 +34,18 @@ public abstract class CardPile implements ICardPile {
         return false;
     }
 
+    /**
+     * Check if both card pile are equivalent.<br>
+     * NOTE: This method <b>DOES</b> sort both card pile.
+     * @param cardPileToCheck ICardPile to compare.
+     */
     public boolean equals(ICardPile cardPileToCheck) {
-        this.sort(SORT_CRITERIA.RANK);
-        cardPileToCheck.sort(SORT_CRITERIA.RANK);
-
         if (this.size() != cardPileToCheck.size()) {
             return false;
         }
+
+        this.sort(SORT_CRITERIA.RANK);
+        cardPileToCheck.sort(SORT_CRITERIA.RANK);
 
         for(int i = 0; i < cards.size(); i+=1) {
             if (! this.getCardAt(i).getValue().equals(cardPileToCheck.getCardAt(i).getValue())) {
@@ -41,35 +56,61 @@ public abstract class CardPile implements ICardPile {
         return true;
     };
 
+    /**
+     * @return Number of card currently in card pile.
+     */
     @Override
     public int size() {
         return cards.size();
     }
+
+    /**
+     * @return Max possible number of card for card pile (usually 52 cards).
+     */
     @Override
     public int getMaxSize() { return CardPile._maxSize; }
+
+    /**
+     * @return If card pile is empty or not.
+     */
     @Override
     public boolean isEmpty() {
         return cards.size() == 0;
     }
+
+    /**
+     * Push card if it isn't already inside and under max size.
+     * @param card Card to push in card pile.
+     * @return If card got successfully pushed.
+     */
     @Override
     public boolean pushCard(Card card) {
-        // Needs to be moved in rule
         if (size() >= getMaxSize() || contains(card)) {
             return false;
         }
+
         cards.add(card);
         return true;
     }
 
+    /**
+     * @param iCardPile CardPile to push cards from.
+     */
     public void pushCard(ICardPile iCardPile) {
-        if (iCardPile != NullCardPile.GetSingleton()) {
-            CardPile cardPile = (CardPile) iCardPile;
+        if (iCardPile == NullCardPile.GetSingleton()) { return; }
 
-            for(Card card: cardPile.cards) {
-                pushCard(card);
-            }
+        CardPile cardPile = (CardPile) iCardPile;
+        for(Card card: cardPile.cards) {
+            pushCard(card);
         }
     }
+
+    /**
+     * Return card at defined index.<br>
+     * If index isn't in correct range return NullCard
+     * @param index Index to look in card pile.
+     * @return Defined card or NullCard
+     */
     @Override
     public Card getCardAt(int index) {
         if (index >= 0 && index < cards.size()) {
@@ -79,6 +120,7 @@ public abstract class CardPile implements ICardPile {
     }
 
     /**
+     * Sort card pile by defined criteria.
      * @param criteria Authorized values: SORT_CRITERIA
      */
     public void sort(SORT_CRITERIA criteria) {
@@ -93,6 +135,13 @@ public abstract class CardPile implements ICardPile {
             }
         }
     }
+
+    /**
+     * Return String representation of card pile.<br>
+     * This <b>DOES NOT</b> sort card pile.
+     * @param sortCriteria Criteria to build representation from, there is no sorting there.
+     * @return String representation of card pile.
+     */
     public String asString(SORT_CRITERIA sortCriteria) {
         StringBuilder cardPileAsString = new StringBuilder();
         for (Object o: cards.toArray()) {
@@ -113,15 +162,19 @@ public abstract class CardPile implements ICardPile {
     }
 
     /**
-     * Returns String representation of CardPile with default sort criteria as Value
-     * @return String
+     * Returns String representation of CardPile with defined sortCriteria and separator
+     * @return String representation of CardPile
+     */
+    public String asString(SORT_CRITERIA sortCriteria, String separator) {
+        return asString(sortCriteria).replace(CardPile.CARD_CHAR_SEPARATOR, separator);
+    }
+
+    /**
+     * Returns String representation of CardPile with default sort criteria ( <b>VALUE</b> ) and separator ( <b>/</b> )
+     * @return String representation of CardPile
      */
     public String asString() {
         return asString(SORT_CRITERIA.VALUE);
-    }
-
-    public String asString(SORT_CRITERIA sortCriteria, String separator) {
-        return asString(sortCriteria).replace(CardPile.CARD_CHAR_SEPARATOR, separator);
     }
 
     /**
@@ -136,6 +189,13 @@ public abstract class CardPile implements ICardPile {
             case COLOR -> o2.getColorAsInt() - o1.getColorAsInt();
         };
     }
+
+    /**
+     * Return if card pile is sorted.
+     * Return always true if empty or 1 card.
+     * @param sortCriteria Criteria of sorting
+     * @return If card pile is sorted
+     */
     public boolean isSorted(SORT_CRITERIA sortCriteria) {
         if (cards.isEmpty() || cards.size() == 1) {
             return true;
@@ -152,6 +212,10 @@ public abstract class CardPile implements ICardPile {
         }
         return true;
     }
+
+    /**
+     * Empty cards array list.
+     */
     public void clear() {
         cards.clear();
     }
