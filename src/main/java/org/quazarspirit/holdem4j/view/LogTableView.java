@@ -1,18 +1,18 @@
-package org.quazarspirit.holdem4j.view;
+package org.quazarspirit.holdem4j.View;
 
-import org.quazarspirit.holdem4j.game_logic.BettingRound;
-import org.quazarspirit.holdem4j.player_logic.player.IPlayer;
-import org.quazarspirit.holdem4j.player_logic.enums.PLAYER_INTENT;
-import org.quazarspirit.holdem4j.room_logic.ITable;
-import org.quazarspirit.holdem4j.room_logic.POSITION;
-import org.quazarspirit.holdem4j.room_logic.PositionHandler;
-import org.quazarspirit.utils.Utils;
-import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
+import org.quazarspirit.Utils.Utils;
+import org.quazarspirit.Utils.PubSub.Event;
+import org.quazarspirit.holdem4j.GameLogic.BettingRound;
+import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
+import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
+import org.quazarspirit.holdem4j.RoomLogic.ITable;
+import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
+import org.quazarspirit.holdem4j.RoomLogic.PositionHandler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class LogTableView implements ITableView{
+public class LogTableView implements ITableView {
     /**
      * @param event Event to be logged
      */
@@ -23,16 +23,16 @@ public class LogTableView implements ITableView{
         ITable table = (ITable) event.source;
         Utils.Log("Event: " + event.data.get("type"), Utils.LOG_LEVEL.DEBUG);
         Object eventDataType = event.data.get("type");
-        if (eventDataType == PLAYER_INTENT.JOIN || eventDataType == PLAYER_INTENT.LEAVE) {
-            //Utils.Log("Game: " + table.getGame().asString() +
-            //                   " Player count: " + table.getPlayerCount());
-        } else if (eventDataType == BettingRound.EVENT.NEXT) {
-            if(table.getRound().getPhase() != BettingRound.PHASE.STASIS) {
+        if (eventDataType == PlayerIntentEnum.JOIN || eventDataType == PlayerIntentEnum.LEAVE) {
+            // Utils.Log("Game: " + table.getGame().asString() +
+            // " Player count: " + table.getPlayerCount());
+        } else if (eventDataType == BettingRound.Event.NEXT) {
+            if (table.getRound().getPhase() != BettingRound.PHASE.STASIS) {
 
-                ArrayList<POSITION> playingPosition = table.getUsedPositions();
+                ArrayList<PositionEnum> playingPosition = table.getUsedPositions();
 
-                for(Iterator<POSITION> iterator = playingPosition.iterator(); iterator.hasNext();) {
-                    POSITION positionName = iterator.next();
+                for (Iterator<PositionEnum> iterator = playingPosition.iterator(); iterator.hasNext();) {
+                    PositionEnum positionName = iterator.next();
                     IPlayer player = table.getPlayerFromPosition(positionName);
                     Utils.Log("PositionHandler: " + positionName +
                             " " + table.getPocketCards(player).asString());

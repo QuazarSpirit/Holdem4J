@@ -1,8 +1,4 @@
-package org.quazarspirit.utils.logger;
-
-import org.quazarspirit.utils.Utils;
-import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
-import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
+package org.quazarspirit.Utils.Logger;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -11,13 +7,20 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+import org.quazarspirit.Utils.Utils;
+import org.quazarspirit.Utils.PubSub.Event;
+import org.quazarspirit.Utils.PubSub.ISubscriber;
+
 public class TCPLogger extends Thread implements ILogger, ISubscriber {
     private static TCPLogger _singleton;
     private final int _wss_port;
     private boolean _available = false;
     private Socket _client;
     private ServerSocket _server;
-    private TCPLogger() {_wss_port = (int) Utils.GetEnv("wss_port", 800);}
+
+    private TCPLogger() {
+        _wss_port = (int) Utils.GetEnv("wss_port", 800);
+    }
 
     public static TCPLogger GetSingleton() {
         if (_singleton == null) {
@@ -66,8 +69,7 @@ public class TCPLogger extends Thread implements ILogger, ISubscriber {
             } catch (SocketException e) {
                 resetServer();
                 break;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -78,10 +80,10 @@ public class TCPLogger extends Thread implements ILogger, ISubscriber {
             _client.close();
             _server.close();
             /*
-            while (_client.isClosed() || !_server.isClosed()) {
-                System.out.println("Waiting");
-                TimeUnit.MILLISECONDS.sleep(300);
-            }
+             * while (_client.isClosed() || !_server.isClosed()) {
+             * System.out.println("Waiting");
+             * TimeUnit.MILLISECONDS.sleep(300);
+             * }
              */
             TimeUnit.MILLISECONDS.sleep(300);
             startSocketServer();
@@ -111,4 +113,3 @@ public class TCPLogger extends Thread implements ILogger, ISubscriber {
         log(event.data.get("message"));
     }
 }
-

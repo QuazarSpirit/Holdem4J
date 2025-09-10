@@ -6,14 +6,14 @@ import org.jeasy.rules.api.RulesEngine;
 import org.jeasy.rules.core.DefaultRulesEngine;
 import org.jeasy.rules.mvel.MVELRuleFactory;
 import org.jeasy.rules.support.reader.YamlRuleDefinitionReader;
-import org.quazarspirit.utils.Utils;
+import org.quazarspirit.Utils.Utils;
 
 import java.io.FileReader;
 import java.util.ArrayList;
 
 public class RuleEngine {
     public static void main(String[] args) throws Exception {
-        //create a person instance (fact)
+        // create a person instance (fact)
 
         Facts facts = new Facts();
         MVELRuleFactory ruleFactory = new MVELRuleFactory(new YamlRuleDefinitionReader());
@@ -26,7 +26,7 @@ public class RuleEngine {
         alcoholRules.register();
         nameRules.register();
 
-        //create a default rules engine and fire rules on known facts
+        // create a default rules engine and fire rules on known facts
         RulesEngine rulesEngine = new DefaultRulesEngine();
 
         Utils.Log("Tom: Hi! can I have some Vodka please?");

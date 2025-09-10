@@ -1,7 +1,6 @@
 package org.quazarspirit.holdem4j;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.quazarspirit.utils.Utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -10,7 +9,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.http.HttpClient;
 
-public class NetworkLogic extends Thread{
+import org.quazarspirit.Utils.Utils;
+
+public class NetworkLogic extends Thread {
     private DatagramSocket socket;
     private boolean running;
     private byte[] buf = new byte[256];
@@ -46,11 +47,12 @@ public class NetworkLogic extends Thread{
             Utils.Log(received);
 
             /*
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }*/
+             * try {
+             * socket.send(packet);
+             * } catch (IOException e) {
+             * throw new RuntimeException(e);
+             * }
+             */
         }
         socket.close();
     }

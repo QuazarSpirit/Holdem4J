@@ -1,6 +1,6 @@
-package org.quazarspirit.holdem4j.view;
+package org.quazarspirit.holdem4j.View;
 
-import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
+import org.quazarspirit.Utils.PubSub.ISubscriber;
 
 public interface ITableView extends ISubscriber {
 }

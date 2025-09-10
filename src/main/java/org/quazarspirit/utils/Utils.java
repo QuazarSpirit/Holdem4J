@@ -1,11 +1,11 @@
-package org.quazarspirit.utils;
+package org.quazarspirit.Utils;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.quazarspirit.utils.logger.SimpleLogger;
-import org.quazarspirit.utils.logger.TCPLogger;
-import org.quazarspirit.utils.publisher_subscriber_pattern.Publisher;
+import org.quazarspirit.Utils.Logger.SimpleLogger;
+import org.quazarspirit.Utils.Logger.TCPLogger;
+import org.quazarspirit.Utils.PubSub.Publisher;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,6 +16,7 @@ public class Utils {
     public enum EVENT {
         LOG
     }
+
     public enum LOG_LEVEL {
         MESSAGE, INFO, DEBUG, WARNING, ERROR
     }
@@ -40,8 +41,8 @@ public class Utils {
         BufferedReader reader = new BufferedReader(
                 new FileReader(filePath));
         char[] buf = new char[1024];
-        int numRead=0;
-        while((numRead=reader.read(buf)) != -1){
+        int numRead = 0;
+        while ((numRead = reader.read(buf)) != -1) {
             String readData = String.valueOf(buf, 0, numRead);
             fileData.append(readData);
         }
@@ -61,6 +62,7 @@ public class Utils {
         public CircularArrayList() {
             super();
         }
+
         public E get(int index) {
             int i = index % size();
             if (i == -1) {
@@ -76,6 +78,7 @@ public class Utils {
         LogSource() {
             createLoggers();
         }
+
         private void createLoggers() {
             SimpleLogger simpleLogger = new SimpleLogger();
             this.addSubscriber(simpleLogger);
@@ -102,7 +105,7 @@ public class Utils {
         logSource.log(arg);
     }
 
-    public static void Log(String message, Map.Entry<String, Object> ...args) {
+    public static void Log(String message, Map.Entry<String, Object>... args) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("message", message);
         Arrays.stream(args).forEach(arg -> {
@@ -112,7 +115,7 @@ public class Utils {
     }
 
     public static void Log(Object arg, LOG_LEVEL log_level) {
-        if (! IsTesting() && log_level == LOG_LEVEL.DEBUG) {
+        if (!IsTesting() && log_level == LOG_LEVEL.DEBUG) {
             return;
         }
 
@@ -120,7 +123,7 @@ public class Utils {
     }
 
     private static void LoadEnv() {
-        if (! envLoaded) {
+        if (!envLoaded) {
             Dotenv.configure().systemProperties().load();
             envLoaded = true;
         }
@@ -128,7 +131,7 @@ public class Utils {
 
     public static Object GetEnv(String key, Object defaultValue) {
         LoadEnv();
-        Object property  = System.getProperty(key);
+        Object property = System.getProperty(key);
         if (property != null) {
             return property;
         }

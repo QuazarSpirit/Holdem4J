@@ -1,8 +1,8 @@
-package org.quazarspirit.utils;
+package org.quazarspirit.Utils;
 
 import java.util.*;
 
-import org.quazarspirit.holdem4j.game_logic.Game;
+import org.quazarspirit.holdem4j.GameLogic.Game;
 
 public class GameConfigLoader {
 

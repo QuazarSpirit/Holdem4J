@@ -5,9 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.quazarspirit.holdem4j.game_logic.Game;
-import org.quazarspirit.holdem4j.room_logic.lobby.Lobby;
-import org.quazarspirit.utils.GameConfigLoader;
+import org.quazarspirit.Utils.GameConfigLoader;
+import org.quazarspirit.holdem4j.GameLogic.Game;
+import org.quazarspirit.holdem4j.RoomLogic.Lobby.Lobby;
 
 public class Holdem4J {
     public static void main(String[] args) {

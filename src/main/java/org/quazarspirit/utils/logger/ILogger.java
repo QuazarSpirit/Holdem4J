@@ -1,6 +1,6 @@
-package org.quazarspirit.utils.logger;
+package org.quazarspirit.Utils.Logger;
 
-import org.quazarspirit.utils.publisher_subscriber_pattern.ISubscriber;
+import org.quazarspirit.Utils.PubSub.ISubscriber;
 
 public interface ILogger extends ISubscriber {
     void log(Object message);

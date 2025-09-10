@@ -1,10 +1,10 @@
-package org.quazarspirit.utils;
+package org.quazarspirit.Utils;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImmutableKV<K, V> extends AbstractMap.SimpleImmutableEntry<K, V>{
+public class ImmutableKV<K, V> extends AbstractMap.SimpleImmutableEntry<K, V> {
     public ImmutableKV(K key, V value) {
         super(key, value);
     }

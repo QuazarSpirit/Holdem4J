@@ -1,7 +1,7 @@
-package org.quazarspirit.utils.logger;
+package org.quazarspirit.Utils.Logger;
 
-import org.quazarspirit.utils.Utils;
-import org.quazarspirit.utils.publisher_subscriber_pattern.Event;
+import org.quazarspirit.Utils.Utils;
+import org.quazarspirit.Utils.PubSub.Event;
 
 public class SimpleLogger implements ILogger {
     /**
@@ -17,7 +17,9 @@ public class SimpleLogger implements ILogger {
      */
     @Override
     public void update(Event event) {
-        if (event.getType() != Utils.EVENT.LOG) {return;}
+        if (event.getType() != Utils.EVENT.LOG) {
+            return;
+        }
         log(event.data.get("message"));
     }
 }

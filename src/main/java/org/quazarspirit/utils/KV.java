@@ -1,4 +1,4 @@
-package org.quazarspirit.utils;
+package org.quazarspirit.Utils;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -7,7 +7,8 @@ public class KV<K, V> {
     private K _key;
     private V _value;
 
-    public KV() {}
+    public KV() {
+    }
 
     public KV(K key, V value) {
         _key = key;
