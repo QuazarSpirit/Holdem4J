@@ -3,7 +3,7 @@ package org.quazarspirit.holdem4j.GameLogic;
 import java.util.Optional;
 
 import org.quazarspirit.Utils.GameConfigLoader;
-import org.quazarspirit.holdem4j.Card.Card;
+import org.quazarspirit.holdem4j.Card;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.Chip;
 import org.quazarspirit.holdem4j.RoomLogic.Table;
 

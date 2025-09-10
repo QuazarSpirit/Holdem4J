@@ -1,8 +1,8 @@
-package org.quazarspirit.holdem4j.GameLogic.CardPile;
+package org.quazarspirit.holdem4j.CardPile;
 
 import java.util.Random;
 
-import org.quazarspirit.holdem4j.Card.Card;
+import org.quazarspirit.holdem4j.Card;
 import org.quazarspirit.holdem4j.GameLogic.Game;
 
 public class Deck extends CardPile {
@@ -64,8 +64,8 @@ public class Deck extends CardPile {
         Random r = new Random();
         while (!initialDeck.isEmpty()) {
             int index = 0;
-            if (initialDeck.size() > 1) {
-                index = r.nextInt(initialDeck.size() - 1);
+            if (initialDeck.getSize() > 1) {
+                index = r.nextInt(initialDeck.getSize() - 1);
             }
             Card pickedCard = initialDeck.pick(index);
             shuffledDeck.pushCard(pickedCard);

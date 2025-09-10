@@ -1,10 +1,9 @@
-package org.quazarspirit.holdem4j.GameLogic.CardPile;
+package org.quazarspirit.holdem4j.CardPile;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.quazarspirit.holdem4j.Card.Card;
-import org.quazarspirit.holdem4j.Card.NullCard;
+import org.quazarspirit.holdem4j.Card;
 
 public abstract class CardPile implements ICardPile {
     public static final String CARD_CHAR_SEPARATOR = "/";
@@ -23,12 +22,6 @@ public abstract class CardPile implements ICardPile {
         _maxSize = deckMaxSize;
     }
 
-    /**
-     * Returns if <b>VALUE</b> of given card is currently in card pile.
-     * 
-     * @param cardToCheck Card to check, only using his value.
-     * @return If card is in card pile.
-     */
     @Override
     public boolean contains(Card cardToCheck) {
         for (Card card : cards) {
@@ -39,14 +32,8 @@ public abstract class CardPile implements ICardPile {
         return false;
     }
 
-    /**
-     * Check if both card pile are equivalent.<br>
-     * NOTE: This method <b>DOES</b> sort both card pile.
-     * 
-     * @param cardPileToCheck ICardPile to compare.
-     */
     public boolean equals(ICardPile cardPileToCheck) {
-        if (this.size() != cardPileToCheck.size()) {
+        if (this.getSize() != cardPileToCheck.getSize()) {
             return false;
         }
 
@@ -62,39 +49,24 @@ public abstract class CardPile implements ICardPile {
         return true;
     };
 
-    /**
-     * @return Number of card currently in card pile.
-     */
     @Override
-    public int size() {
+    public int getSize() {
         return cards.size();
     }
 
-    /**
-     * @return Max possible number of card for card pile (usually 52 cards).
-     */
     @Override
     public int getMaxSize() {
         return CardPile._maxSize;
     }
 
-    /**
-     * @return If card pile is empty or not.
-     */
     @Override
     public boolean isEmpty() {
         return cards.size() == 0;
     }
 
-    /**
-     * Push card if it isn't already inside and under max size.
-     * 
-     * @param card Card to push in card pile.
-     * @return If card got successfully pushed.
-     */
     @Override
     public boolean pushCard(Card card) {
-        if (size() >= getMaxSize() || contains(card)) {
+        if (getSize() >= getMaxSize() || contains(card)) {
             return false;
         }
 
@@ -102,40 +74,16 @@ public abstract class CardPile implements ICardPile {
         return true;
     }
 
-    /**
-     * @param iCardPile CardPile to push cards from.
-     */
     public void pushCard(ICardPile iCardPile) {
-        if (iCardPile == NullCardPile.GetSingleton()) {
-            return;
-        }
-
-        CardPile cardPile = (CardPile) iCardPile;
-        for (Card card : cardPile.cards) {
+        for (Card card : iCardPile.getCards()) {
             pushCard(card);
         }
     }
 
-    /**
-     * Return card at defined index.<br>
-     * If index isn't in correct range return NullCard
-     * 
-     * @param index Index to look in card pile.
-     * @return Defined card or NullCard
-     */
-    @Override
     public Card getCardAt(int index) {
-        if (index >= 0 && index < cards.size()) {
-            return cards.get(index);
-        }
-        return NullCard.GetSingleton();
+        return cards.get(index);
     }
 
-    /**
-     * Sort card pile by defined criteria.
-     * 
-     * @param criteria Authorized values: SORT_CRITERIA
-     */
     public void sort(SORT_CRITERIA criteria) {
         for (int i = 0; i < cards.size(); i++) {
             for (int j = i; j < cards.size(); j++) {
@@ -186,12 +134,6 @@ public abstract class CardPile implements ICardPile {
         return asString(sortCriteria).replace(CardPile.CARD_CHAR_SEPARATOR, separator);
     }
 
-    /**
-     * Returns String representation of CardPile with default sort criteria (
-     * <b>VALUE</b> ) and separator ( <b>/</b> )
-     * 
-     * @return String representation of CardPile
-     */
     public String asString() {
         return asString(SORT_CRITERIA.VALUE);
     }
@@ -233,9 +175,6 @@ public abstract class CardPile implements ICardPile {
         return true;
     }
 
-    /**
-     * Empty cards array list.
-     */
     public void clear() {
         cards.clear();
     }

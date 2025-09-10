@@ -1,6 +1,6 @@
-package org.quazarspirit.holdem4j.GameLogic.CardPile;
+package org.quazarspirit.holdem4j.CardPile;
 
-import org.quazarspirit.holdem4j.Card.Card;
+import org.quazarspirit.holdem4j.Card;
 
 public class NullCardPile implements ICardPile {
     static final private NullCardPile _singleton = new NullCardPile();
@@ -61,7 +61,7 @@ public class NullCardPile implements ICardPile {
     }
 
     @Override
-    public int size() {
+    public int getSize() {
         return 0;
     }
 

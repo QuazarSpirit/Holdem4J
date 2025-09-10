@@ -1,9 +1,9 @@
 package org.quazarspirit.holdem4j.RoomLogic;
 
+import org.quazarspirit.holdem4j.CardPile.Board;
+import org.quazarspirit.holdem4j.CardPile.ICardPile;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
 import org.quazarspirit.holdem4j.GameLogic.Game;
-import org.quazarspirit.holdem4j.GameLogic.CardPile.Board;
-import org.quazarspirit.holdem4j.GameLogic.CardPile.ICardPile;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.Pot;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 

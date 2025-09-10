@@ -1,6 +1,6 @@
-package org.quazarspirit.holdem4j.GameLogic.CardPile;
+package org.quazarspirit.holdem4j.CardPile;
 
-import org.quazarspirit.holdem4j.Card.Card;
+import org.quazarspirit.holdem4j.Card;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
 import org.quazarspirit.holdem4j.RoomLogic.PositionHandler;

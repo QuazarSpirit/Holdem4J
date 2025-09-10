@@ -1,15 +1,10 @@
-package org.quazarspirit.holdem4j.Card;
+package org.quazarspirit.holdem4j;
 
 public class Card {
     private final String _color;
     private final String _rank;
 
-    public Card(String color, String value) {
-        this._color = color;
-        this._rank = value;
-    }
-
-    public Card(CardBuilder cardBuilder) {
+    private Card(CardBuilder cardBuilder) {
         this._color = cardBuilder.color;
         this._rank = cardBuilder.rank;
     }
@@ -52,5 +47,4 @@ public class Card {
             return new Card(this);
         }
     }
-
 }

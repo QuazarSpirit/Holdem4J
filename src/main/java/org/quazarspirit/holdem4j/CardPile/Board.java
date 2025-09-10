@@ -1,6 +1,6 @@
-package org.quazarspirit.holdem4j.GameLogic.CardPile;
+package org.quazarspirit.holdem4j.CardPile;
 
-import org.quazarspirit.holdem4j.Card.Card;
+import org.quazarspirit.holdem4j.Card;
 
 public class Board extends CardPile {
     static protected int _maxSize = 5;

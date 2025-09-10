@@ -2,9 +2,9 @@ package org.quazarspirit.holdem4j.GameLogic;
 
 import org.jetbrains.annotations.NotNull;
 import org.quazarspirit.Utils.ImmutableKV;
-import org.quazarspirit.holdem4j.Card.Card;
-import org.quazarspirit.holdem4j.GameLogic.CardPile.CardPile;
-import org.quazarspirit.holdem4j.GameLogic.CardPile.Hand;
+import org.quazarspirit.holdem4j.Card;
+import org.quazarspirit.holdem4j.CardPile.CardPile;
+import org.quazarspirit.holdem4j.CardPile.Hand;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -86,7 +86,7 @@ public class RankEvaluator {
         hand.sort(CardPile.SORT_CRITERIA.RANK);
 
         return new ImmutableKV<>(Hand.HAND_RANK.CARD_HIGH,
-                new HandRankInfo(null, hand.getCardAt(hand.size() - 1).getRankAsInt()));
+                new HandRankInfo(null, hand.getCardAt(hand.getSize() - 1).getRankAsInt()));
     }
 
     /**
@@ -104,7 +104,7 @@ public class RankEvaluator {
 
         // Check if handAsString equals any substring or A2345 Straight
         if (Card.RANKS.contains(handAsString)) {
-            Card lastCard = hand.getCardAt(hand.size() - 1);
+            Card lastCard = hand.getCardAt(hand.getSize() - 1);
             HandRankInfo handRankInfo = new HandRankInfo(null, lastCard.getRankAsInt());
             return new ImmutableKV<Boolean, HandRankInfo>(Boolean.TRUE, handRankInfo);
         } else if (handAsString.equals("2345A")) {
@@ -131,7 +131,7 @@ public class RankEvaluator {
 
         if (FLUSH_PATTERN.matcher(handAsString).matches()) {
             hand.sort(CardPile.SORT_CRITERIA.RANK);
-            Card lastCard = hand.getCardAt(hand.size() - 1);
+            Card lastCard = hand.getCardAt(hand.getSize() - 1);
             HandRankInfo handRankInfo = new HandRankInfo(null, lastCard.getRankAsInt());
             return new ImmutableKV<Boolean, HandRankInfo>(Boolean.TRUE, handRankInfo);
         }
