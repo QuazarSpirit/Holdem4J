@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class Utils {
-    public enum EVENT {
+    public enum EventEnum {
         LOG
     }
 
-    public enum LOG_LEVEL {
+    public enum LogLevelEnum {
         MESSAGE, INFO, DEBUG, WARNING, ERROR
     }
 
@@ -95,7 +95,7 @@ public class Utils {
             }
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("type", EVENT.LOG);
+            jsonObject.put("type", EventEnum.LOG);
             jsonObject.put("message", message);
             publish(jsonObject);
         }
@@ -114,8 +114,8 @@ public class Utils {
         logSource.log(jsonObject);
     }
 
-    public static void Log(Object arg, LOG_LEVEL log_level) {
-        if (!IsTesting() && log_level == LOG_LEVEL.DEBUG) {
+    public static void Log(Object arg, LogLevelEnum log_level) {
+        if (!IsTesting() && log_level == LogLevelEnum.DEBUG) {
             return;
         }
 

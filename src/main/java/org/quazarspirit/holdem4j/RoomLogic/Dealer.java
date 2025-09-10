@@ -36,7 +36,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
 
     private final Producer _producer = new Producer();
     private final Publisher _publisher = new Publisher(this);
-    private BettingRound.PHASE _roundPhase;
+    private BettingRound.PhaseEnum _roundPhase;
     private ArrayList<PositionEnum> _currPlayingPos = new ArrayList<>();
 
     private final ArrayList<ImmutableKV<PlayerActionEnum, Bet>> _previousPlayerActions = new ArrayList<>();
@@ -126,7 +126,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
         }
 
         PlayerActionEnum playerAction = PlayerActionEnum.FOLD;
-        if (eventData.get("type") == Table.EVENT.TIMEOUT) {
+        if (eventData.get("type") == Table.EventEnum.TIMEOUT) {
             player = (IPlayer) eventData.get("player");
         } else {
             player = (IPlayer) event.source;
@@ -209,7 +209,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
 
     private void sendPotAddEvent(int value) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", Table.EVENT.POT_ADD);
+        jsonObject.put("type", Table.EventEnum.POT_ADD);
         jsonObject.put("value", value);
         publish(jsonObject);
     }
@@ -325,7 +325,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
         if (eventType == PlayerIntentEnum.JOIN) {
             if (canStart()) {
                 if (!Utils.IsTesting()) {
-                    if (_table.getRound().getPhase() == BettingRound.PHASE.STASIS) {
+                    if (_table.getRound().getPhase() == BettingRound.PhaseEnum.STASIS) {
                         // TODO: SEND EVENT TO TABLE
                         _table.nextBettingRoundPhase();
                     }
@@ -335,13 +335,13 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
             if (!canStart()) {
                 // TODO: Stop table depending on game variant
             }
-        } else if (eventType == BettingRound.Event.NEXT) {
-            if (_table.getRound().getPhase() != BettingRound.PHASE.STASIS) {
+        } else if (eventType == BettingRound.EventEnum.NEXT) {
+            if (_table.getRound().getPhase() != BettingRound.PhaseEnum.STASIS) {
                 if (!Utils.IsTesting()) {
                     playRoundPhase();
                 }
             }
-        } else if (eventType == PlayerIntentEnum.ACT || eventType == Table.EVENT.TIMEOUT) {
+        } else if (eventType == PlayerIntentEnum.ACT || eventType == Table.EventEnum.TIMEOUT) {
             onPlayerAction(event);
         }
     }

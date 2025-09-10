@@ -21,13 +21,13 @@ public class LogTableView implements ITableView {
         // Utils.Log("Source: " + event.source + "\n data: " + event.data);
 
         ITable table = (ITable) event.source;
-        Utils.Log("Event: " + event.data.get("type"), Utils.LOG_LEVEL.DEBUG);
+        Utils.Log("Event: " + event.data.get("type"), Utils.LogLevelEnum.DEBUG);
         Object eventDataType = event.data.get("type");
         if (eventDataType == PlayerIntentEnum.JOIN || eventDataType == PlayerIntentEnum.LEAVE) {
             // Utils.Log("Game: " + table.getGame().asString() +
             // " Player count: " + table.getPlayerCount());
-        } else if (eventDataType == BettingRound.Event.NEXT) {
-            if (table.getRound().getPhase() != BettingRound.PHASE.STASIS) {
+        } else if (eventDataType == BettingRound.EventEnum.NEXT) {
+            if (table.getRound().getPhase() != BettingRound.PhaseEnum.STASIS) {
 
                 ArrayList<PositionEnum> playingPosition = table.getUsedPositions();
 

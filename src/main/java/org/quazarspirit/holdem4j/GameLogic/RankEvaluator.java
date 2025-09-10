@@ -23,43 +23,43 @@ public class RankEvaluator {
      * @return Entry that returns both rank and rank as String
      *         return example: {Hand.HAND_RANK.FULL_HOUSE, "2:3"}
      */
-    static public Map.Entry<Hand.HAND_RANK, HandRankInfo> evaluate(Hand refHand) {
+    static public Map.Entry<Hand.RankEnum, HandRankInfo> evaluate(Hand refHand) {
 
         Map.Entry<Boolean, HandRankInfo> isRoyalFlushCheck = isRoyalFlush(refHand);
         if (isRoyalFlushCheck.getKey()) {
-            return new ImmutableKV<>(Hand.HAND_RANK.ROYAL_FLUSH, isRoyalFlushCheck.getValue());
+            return new ImmutableKV<>(Hand.RankEnum.ROYAL_FLUSH, isRoyalFlushCheck.getValue());
         }
 
         Map.Entry<Boolean, HandRankInfo> isStraightFlushCheck = isStraightFlush(refHand);
         if (isStraightFlushCheck.getKey()) {
-            return new ImmutableKV<>(Hand.HAND_RANK.STRAIGHT_FLUSH, isStraightFlushCheck.getValue());
+            return new ImmutableKV<>(Hand.RankEnum.STRAIGHT_FLUSH, isStraightFlushCheck.getValue());
         }
 
         Map.Entry<Boolean, HandRankInfo> isFlushCheck = isFlush(refHand);
         if (isFlushCheck.getKey()) {
-            return new ImmutableKV<>(Hand.HAND_RANK.FLUSH, isFlushCheck.getValue());
+            return new ImmutableKV<>(Hand.RankEnum.FLUSH, isFlushCheck.getValue());
         }
 
         Map.Entry<Boolean, HandRankInfo> isStraightCheck = isStraight(refHand);
         if (isStraightCheck.getKey()) {
-            return new ImmutableKV<>(Hand.HAND_RANK.STRAIGHT, isStraightCheck.getValue());
+            return new ImmutableKV<>(Hand.RankEnum.STRAIGHT, isStraightCheck.getValue());
         }
 
         HandRankInfo rankInfo = getRankRepetitions(refHand);
         ArrayList<Map.Entry<Integer, String>> rankRepetition = rankInfo.getRankRepetitions();
         int rnkRepSize = rankRepetition.size();
         if (rnkRepSize > 0 && rnkRepSize <= 2) {
-            Hand.HAND_RANK handRankResult;
+            Hand.RankEnum handRankResult;
             String highnessResult;
 
             if (rnkRepSize == 1) {
                 Map.Entry<Integer, String> rankRepKV = rankRepetition.get(0);
                 if (rankRepKV.getKey() == 4) {
-                    handRankResult = Hand.HAND_RANK.FOUR_OF_A_KIND;
+                    handRankResult = Hand.RankEnum.FOUR_OF_A_KIND;
                 } else if (rankRepKV.getKey() == 3) {
-                    handRankResult = Hand.HAND_RANK.THREE_OF_A_KIND;
+                    handRankResult = Hand.RankEnum.THREE_OF_A_KIND;
                 } else {
-                    handRankResult = Hand.HAND_RANK.PAIR;
+                    handRankResult = Hand.RankEnum.PAIR;
                 }
 
                 // highnessResult = rankRepKV.getValue();
@@ -71,10 +71,10 @@ public class RankEvaluator {
 
                 // Warning Integer comparison vs int
                 if (Objects.equals(repRank_1.getKey(), repRank_2.getKey())) {
-                    handRankResult = Hand.HAND_RANK.DOUBLE_PAIR;
+                    handRankResult = Hand.RankEnum.DOUBLE_PAIR;
                     highnessResult = String.valueOf(Card.RANKS.charAt(rankInfo.getHighness()));
                 } else {
-                    handRankResult = Hand.HAND_RANK.FULL_HOUSE;
+                    handRankResult = Hand.RankEnum.FULL_HOUSE;
                     highnessResult = String.valueOf(Card.RANKS.charAt(rankInfo.getHighness()))
                             + ":" + rankInfo.getRankRepetitions().get(rankInfo.getPairIndex()).getValue();
                 }
@@ -83,9 +83,9 @@ public class RankEvaluator {
         }
 
         Hand hand = new Hand(refHand);
-        hand.sort(CardPile.SORT_CRITERIA.RANK);
+        hand.sort(CardPile.CardCriteriaEnum.RANK);
 
-        return new ImmutableKV<>(Hand.HAND_RANK.CARD_HIGH,
+        return new ImmutableKV<>(Hand.RankEnum.CARD_HIGH,
                 new HandRankInfo(null, hand.getCardAt(hand.getSize() - 1).getRankAsInt()));
     }
 
@@ -98,9 +98,9 @@ public class RankEvaluator {
      */
     static private Map.Entry<Boolean, HandRankInfo> isStraight(@NotNull Hand refHand) {
         Hand hand = new Hand(refHand);
-        hand.sort(CardPile.SORT_CRITERIA.RANK);
+        hand.sort(CardPile.CardCriteriaEnum.RANK);
 
-        String handAsString = hand.asString(CardPile.SORT_CRITERIA.RANK, "");
+        String handAsString = hand.asString(CardPile.CardCriteriaEnum.RANK, "");
 
         // Check if handAsString equals any substring or A2345 Straight
         if (Card.RANKS.contains(handAsString)) {
@@ -125,12 +125,12 @@ public class RankEvaluator {
      */
     static private Map.Entry<Boolean, HandRankInfo> isFlush(@NotNull Hand refHand) {
         Hand hand = new Hand(refHand);
-        hand.sort(CardPile.SORT_CRITERIA.COLOR);
+        hand.sort(CardPile.CardCriteriaEnum.COLOR);
 
-        String handAsString = hand.asString(CardPile.SORT_CRITERIA.COLOR, "");
+        String handAsString = hand.asString(CardPile.CardCriteriaEnum.COLOR, "");
 
         if (FLUSH_PATTERN.matcher(handAsString).matches()) {
-            hand.sort(CardPile.SORT_CRITERIA.RANK);
+            hand.sort(CardPile.CardCriteriaEnum.RANK);
             Card lastCard = hand.getCardAt(hand.getSize() - 1);
             HandRankInfo handRankInfo = new HandRankInfo(null, lastCard.getRankAsInt());
             return new ImmutableKV<Boolean, HandRankInfo>(Boolean.TRUE, handRankInfo);
@@ -182,10 +182,10 @@ public class RankEvaluator {
      */
     static private HandRankInfo getRankRepetitions(Hand refHand) {
         Hand hand = new Hand(refHand);
-        hand.sort(CardPile.SORT_CRITERIA.RANK);
+        hand.sort(CardPile.CardCriteriaEnum.RANK);
 
         ArrayList<Map.Entry<Integer, String>> rankRepetitions = new ArrayList<>();
-        String handAsString = hand.asString(CardPile.SORT_CRITERIA.RANK, "");
+        String handAsString = hand.asString(CardPile.CardCriteriaEnum.RANK, "");
 
         for (char rank : Card.RANKS.toCharArray()) {
             int count = (int) handAsString.chars().filter(ch -> ch == rank).count();

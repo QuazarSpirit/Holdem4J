@@ -1,14 +1,14 @@
 package org.quazarspirit.holdem4j.GameLogic.ChipPile;
 
 public class ChipCount implements IChipCount {
-    enum LOCATION {
+    enum LocationEnum {
         PLAYER_STACK, PLAYER_BET_AREA, TABLE
     }
 
     private final Chip _unit;
     protected int _sb_count;
 
-    protected LOCATION _location = LOCATION.TABLE;
+    protected LocationEnum _location = LocationEnum.TABLE;
 
     ChipCount(Chip unit) {
         _unit = unit;
@@ -19,7 +19,7 @@ public class ChipCount implements IChipCount {
         set(count);
     }
 
-    ChipCount(Chip unit, int count, LOCATION location) {
+    ChipCount(Chip unit, int count, LocationEnum location) {
         this(unit, count);
         location = _location;
     }

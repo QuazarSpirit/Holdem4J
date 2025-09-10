@@ -8,15 +8,12 @@ import org.quazarspirit.holdem4j.Card;
 public abstract class CardPile implements ICardPile {
     public static final String CARD_CHAR_SEPARATOR = "/";
 
-    public enum SORT_CRITERIA {
+    public enum CardCriteriaEnum {
         RANK, COLOR, VALUE
     }
 
     private static int _maxSize = 52;
     protected final ArrayList<Card> cards = new ArrayList<Card>();
-
-    CardPile() {
-    }
 
     CardPile(int deckMaxSize) {
         _maxSize = deckMaxSize;
@@ -37,8 +34,8 @@ public abstract class CardPile implements ICardPile {
             return false;
         }
 
-        this.sort(SORT_CRITERIA.RANK);
-        cardPileToCheck.sort(SORT_CRITERIA.RANK);
+        this.sort(CardCriteriaEnum.RANK);
+        cardPileToCheck.sort(CardCriteriaEnum.RANK);
 
         for (int i = 0; i < cards.size(); i += 1) {
             if (!this.getCardAt(i).getValue().equals(cardPileToCheck.getCardAt(i).getValue())) {
@@ -84,7 +81,7 @@ public abstract class CardPile implements ICardPile {
         return cards.get(index);
     }
 
-    public void sort(SORT_CRITERIA criteria) {
+    public void sort(CardCriteriaEnum criteria) {
         for (int i = 0; i < cards.size(); i++) {
             for (int j = i; j < cards.size(); j++) {
                 Card card_a = cards.get(i);
@@ -105,14 +102,14 @@ public abstract class CardPile implements ICardPile {
      *                     sorting there.
      * @return String representation of card pile.
      */
-    public String asString(SORT_CRITERIA sortCriteria) {
+    public String asString(CardCriteriaEnum sortCriteria) {
         StringBuilder cardPileAsString = new StringBuilder();
         for (Object o : cards.toArray()) {
             Card card = (Card) o;
             String card_Str;
-            if (sortCriteria == SORT_CRITERIA.COLOR) {
+            if (sortCriteria == CardCriteriaEnum.COLOR) {
                 card_Str = card.getColor();
-            } else if (sortCriteria == SORT_CRITERIA.RANK) {
+            } else if (sortCriteria == CardCriteriaEnum.RANK) {
                 card_Str = card.getRank();
             } else {
                 card_Str = card.getValue();
@@ -130,12 +127,12 @@ public abstract class CardPile implements ICardPile {
      * 
      * @return String representation of CardPile
      */
-    public String asString(SORT_CRITERIA sortCriteria, String separator) {
+    public String asString(CardCriteriaEnum sortCriteria, String separator) {
         return asString(sortCriteria).replace(CardPile.CARD_CHAR_SEPARATOR, separator);
     }
 
     public String asString() {
-        return asString(SORT_CRITERIA.VALUE);
+        return asString(CardCriteriaEnum.VALUE);
     }
 
     /**
@@ -144,7 +141,7 @@ public abstract class CardPile implements ICardPile {
      * @param sortCriteria Authorized values: SORT_CRITERIA
      * @return integer
      */
-    private int compare(Card o1, Card o2, SORT_CRITERIA sortCriteria) {
+    private int compare(Card o1, Card o2, CardCriteriaEnum sortCriteria) {
         return switch (sortCriteria) {
             case RANK, VALUE -> o2.getRankAsInt() - o1.getRankAsInt();
             case COLOR -> o2.getColorAsInt() - o1.getColorAsInt();
@@ -158,7 +155,7 @@ public abstract class CardPile implements ICardPile {
      * @param sortCriteria Criteria of sorting
      * @return If card pile is sorted
      */
-    public boolean isSorted(SORT_CRITERIA sortCriteria) {
+    public boolean isSorted(CardCriteriaEnum sortCriteria) {
         if (cards.isEmpty() || cards.size() == 1) {
             return true;
         }

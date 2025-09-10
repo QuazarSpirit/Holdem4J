@@ -17,7 +17,7 @@ public class SimpleLogger implements ILogger {
      */
     @Override
     public void update(Event event) {
-        if (event.getType() != Utils.EVENT.LOG) {
+        if (event.getType() != Utils.EventEnum.LOG) {
             return;
         }
         log(event.data.get("message"));

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Hand extends CardPile {
     static protected final int _maxSize = 5;
 
-    public enum HAND_RANK {
+    public enum RankEnum {
         NONE(-1), CARD_HIGH(0.9953015), PAIR(1.366477),
         DOUBLE_PAIR(20.03535), THREE_OF_A_KIND(46.32955),
         STRAIGHT(253.8), FLUSH(508.8019), FULL_HOUSE(693.1667),
@@ -19,7 +19,7 @@ public class Hand extends CardPile {
 
         private final double _probability;
 
-        HAND_RANK(double probability) {
+        RankEnum(double probability) {
             _probability = probability;
         }
 
@@ -65,13 +65,13 @@ public class Hand extends CardPile {
         return hand;
     }
 
-    HAND_RANK computeRank(Table table, PositionEnum _name) {
+    RankEnum computeRank(Table table, PositionEnum _name) {
         Board board = table.getBoard();
         IPlayer player = table.getPlayerFromPosition(_name);
         ICardPile cardPile = table.getPocketCards(player);
 
         if (cardPile.equals(NullCardPile.GetSingleton())) {
-            return HAND_RANK.NONE;
+            return RankEnum.NONE;
         }
 
         PocketCards pocketCards = (PocketCards) cardPile;
@@ -100,6 +100,12 @@ public class Hand extends CardPile {
          * }
          * }
          */
-        return HAND_RANK.NONE;
+        return RankEnum.NONE;
+    }
+
+    @Override
+    public ArrayList<Card> getCards() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCards'");
     }
 }

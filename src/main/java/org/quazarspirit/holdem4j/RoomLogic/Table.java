@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Table extends Thread implements ITable, ISubscriber, IPublisher {
-    public enum EVENT implements IEventType {
+    public enum EventEnum implements IEventType {
         TIMEOUT, POT_ADD, POT_RESET;
     }
 
@@ -67,19 +67,19 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         // _bettingRound.getPhase().toString());
         /// _bettingRound.nextPhase();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", BettingRound.Event.NEXT);
+        jsonObject.put("type", BettingRound.EventEnum.NEXT);
         jsonObject.put("round_phase", _bettingRound.getPhase().getNext());
         publish(jsonObject);
 
-        BettingRound.PHASE roundPhase = _bettingRound.getPhase();
+        BettingRound.PhaseEnum roundPhase = _bettingRound.getPhase();
         Utils.Log(_bettingRound.getPhase());
 
-        if (roundPhase == BettingRound.PHASE.STASIS) {
+        if (roundPhase == BettingRound.PhaseEnum.STASIS) {
             // Manage waiting players
             manageWaitingPlayers();
             // Update player seat
             updatePlayerSeat();
-        } else if (roundPhase == BettingRound.PHASE.PRE_FLOP) {
+        } else if (roundPhase == BettingRound.PhaseEnum.PRE_FLOP) {
             _tableRoundCounter += 1;
 
             updatePlayerPositions();
@@ -89,8 +89,8 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     public void resetBettingRoundPhase() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", BettingRound.Event.RESET);
-        jsonObject.put("round_phase", BettingRound.PHASE.STASIS);
+        jsonObject.put("type", BettingRound.EventEnum.RESET);
+        jsonObject.put("round_phase", BettingRound.PhaseEnum.STASIS);
         publish(jsonObject);
 
         // Manage waiting players
@@ -103,7 +103,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         // Utils.Log("Updating player positions");
 
         JSONObject bindPositionToSeatEventData = new JSONObject();
-        bindPositionToSeatEventData.put("type", PlayerSeatRegistry.EVENT.BIND);
+        bindPositionToSeatEventData.put("type", PlayerSeatRegistry.EventEnum.BIND);
         bindPositionToSeatEventData.put("table_round_count", _tableRoundCounter);
         publish(bindPositionToSeatEventData);
     }
@@ -216,7 +216,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             }
         }
 
-        if (_bettingRound.getPhase() == BettingRound.PHASE.STASIS) {
+        if (_bettingRound.getPhase() == BettingRound.PhaseEnum.STASIS) {
             _playerSeats.add(player);
 
             _dealer.addSubscriber(player);
@@ -239,7 +239,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     }
 
     public void removePlayer(IPlayer player) {
-        if (_game.getFormat() == Game.FORMAT.CASHGAME) {
+        if (_game.getFormat() == Game.FormatEnum.CASHGAME) {
             isOpened = true;
         }
 
@@ -247,7 +247,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             return;
         }
 
-        if (_bettingRound.getPhase() == BettingRound.PHASE.STASIS) {
+        if (_bettingRound.getPhase() == BettingRound.PhaseEnum.STASIS) {
             PositionEnum positionToRemove = getPositionFromPlayer(player);
             players.remove(positionToRemove);
 
@@ -373,7 +373,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             try {
                 wait(2000);
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("type", EVENT.TIMEOUT);
+                jsonObject.put("type", EventEnum.TIMEOUT);
                 jsonObject.put("player", event.data.get("player"));
                 publish(jsonObject);
             } catch (Exception e) {
@@ -383,11 +383,11 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             JSONObject jsonObject = event.data;
             jsonObject.put("player", event.source);
             publish(jsonObject);
-        } else if (eventType == EVENT.POT_ADD) {
+        } else if (eventType == EventEnum.POT_ADD) {
             _pot.add((int) event.data.get("value"));
             JSONObject jsonObject = event.data;
             publish(jsonObject);
-        } else if (eventType == BettingRound.Event.NEXT) {
+        } else if (eventType == BettingRound.EventEnum.NEXT) {
             if (_dealer == event.source) {
                 // TODO: Dealer send BettingRound.EVENT.NEXT
                 nextBettingRoundPhase();

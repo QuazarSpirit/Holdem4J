@@ -62,7 +62,7 @@ public interface ICardPile {
      * 
      * @param criteria Authorized values: SORT_CRITERIA
      */
-    public void sort(CardPile.SORT_CRITERIA criteria);
+    public void sort(CardPile.CardCriteriaEnum criteria);
 
     /**
      * Check if both card pile are equivalent.<br>
@@ -72,7 +72,7 @@ public interface ICardPile {
      */
     public boolean equals(ICardPile cardPileToCheck);
 
-    public String asString(CardPile.SORT_CRITERIA sortCriteria);
+    public String asString(CardPile.CardCriteriaEnum sortCriteria);
 
     /**
      * Returns String representation of CardPile with default sort criteria (
@@ -82,7 +82,7 @@ public interface ICardPile {
      */
     public String asString();
 
-    public String asString(CardPile.SORT_CRITERIA sortCriteria, String separator);
+    public String asString(CardPile.CardCriteriaEnum sortCriteria, String separator);
 
     /**
      * Empty cards array list.

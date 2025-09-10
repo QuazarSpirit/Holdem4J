@@ -9,9 +9,9 @@ public class GameConfigLoader {
     private Properties config = new Properties();
 
     private final Map<String, Class<? extends Enum<?>>> enumMapping = Map.of(
-            "betStructure", Game.BET_STRUCTURE.class,
-            "gameVariant", Game.VARIANT.class,
-            "gameFormat", Game.FORMAT.class);
+            "betStructure", Game.BetStructureEnum.class,
+            "gameVariant", Game.VariantEnum.class,
+            "gameFormat", Game.FormatEnum.class);
 
     private final Map<String, Enum<?>> parsedValues = new HashMap<>();
 

@@ -25,7 +25,7 @@ public class Bet extends ChipCount implements IBet {
      * @return Result of validation by rules
      */
     public static boolean isValid(Game game, int count, IPlayer player, Table table) {
-        Game.BET_STRUCTURE betStructure = game.getBetStructure();
+        Game.BetStructureEnum betStructure = game.getBetStructure();
         Chip unit = table.getGame().getUnit();
         ChipCount minimumBet = new ChipCount(unit, 2);
         ; // Expressed in Number of SB
@@ -45,8 +45,8 @@ public class Bet extends ChipCount implements IBet {
                 // Raising is only increments of last bet, so if first bet is 4$
                 // next bet will be 8$ then 12$, ..
 
-                BettingRound.PHASE roundPhase = table.getRound().getPhase();
-                if (roundPhase == BettingRound.PHASE.RIVER || roundPhase == BettingRound.PHASE.TURN) {
+                BettingRound.PhaseEnum roundPhase = table.getRound().getPhase();
+                if (roundPhase == BettingRound.PhaseEnum.RIVER || roundPhase == BettingRound.PhaseEnum.TURN) {
                     // if roundPhase is flop or before, you can only use small bet
                     // if roundPhase is river or turn, you can only use big bet
                     minimumBet = new ChipCount(unit, 4);

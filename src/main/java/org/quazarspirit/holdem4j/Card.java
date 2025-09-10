@@ -26,7 +26,7 @@ public class Card {
     }
 
     public String getValue() {
-        return this._rank;
+        return new StringBuilder(_rank).append(_color).toString();
     }
 
     public static class CardBuilder {

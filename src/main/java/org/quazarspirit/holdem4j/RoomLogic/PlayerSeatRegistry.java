@@ -17,11 +17,11 @@ import org.quazarspirit.holdem4j.PlayerLogic.PlayerSeat.PlayerSeat;
 import java.util.*;
 
 public class PlayerSeatRegistry extends Publisher implements ISubscriber {
-    public enum EVENT implements IEventType {
+    public enum EventEnum implements IEventType {
         ADD, REMOVE, BIND;
     }
 
-    public enum FILTER {
+    public enum FilterEnum {
         ALL, BOUND_SEAT
     }
 
@@ -87,7 +87,7 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
 
     private void sendAllocateEvent() {
         JSONObject eventData = new JSONObject();
-        eventData.put("type", PositionHandler.EVENT.ALLOCATE);
+        eventData.put("type", PositionHandler.EventEnum.ALLOCATE);
         eventData.put("max_seat_count", _maxSeatCount);
         eventData.put("player_count", size());
         publish(eventData);
@@ -201,14 +201,14 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
     }
 
     public String asString() {
-        return asString(FILTER.ALL);
+        return asString(FilterEnum.ALL);
     }
 
-    public String asString(FILTER filter) {
+    public String asString(FilterEnum filter) {
         StringBuilder stringBuilder = new StringBuilder();
         for (ImmutableKV<IPlayer, IPlayerSeat> kv : playersSeat.values()) {
-            if (filter == FILTER.ALL ||
-                    (filter == FILTER.BOUND_SEAT && kv != EMPTY_SEAT)) {
+            if (filter == FilterEnum.ALL ||
+                    (filter == FilterEnum.BOUND_SEAT && kv != EMPTY_SEAT)) {
                 stringBuilder.append(kv.getValue().asString()).append("\n");
             }
         }
@@ -240,13 +240,13 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
 
     @Override
     public void update(Event event) {
-        if (event.getType() == EVENT.BIND) {
+        if (event.getType() == EventEnum.BIND) {
             Table table = (Table) event.source;
             int table_round_count = event.data.getInt("table_round_count");
             bindPositions(table_round_count);
-        } else if (event.getType() == EVENT.ADD) {
+        } else if (event.getType() == EventEnum.ADD) {
 
-        } else if (event.getType() == EVENT.REMOVE) {
+        } else if (event.getType() == EventEnum.REMOVE) {
 
         }
     }

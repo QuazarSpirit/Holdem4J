@@ -4,7 +4,7 @@ import org.quazarspirit.holdem4j.GameLogic.Game;
 
 public class Pot extends ChipCount {
     public Pot(Chip unit) {
-        super(unit, 0, LOCATION.TABLE);
+        super(unit, 0, LocationEnum.TABLE);
     }
 
     // TODO: Handle different betStructure

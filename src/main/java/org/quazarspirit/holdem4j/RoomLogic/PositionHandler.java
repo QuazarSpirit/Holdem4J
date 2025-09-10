@@ -9,7 +9,7 @@ import org.quazarspirit.holdem4j.GameLogic.BettingRound;
 import java.util.*;
 
 public class PositionHandler implements ISubscriber {
-    public enum EVENT implements IEventType {
+    public enum EventEnum implements IEventType {
         ALLOCATE
     }
 
@@ -26,7 +26,7 @@ public class PositionHandler implements ISubscriber {
     public void update(Event event) {
         // Utils.Log("Got event");
 
-        if (event.data.get("type") == EVENT.ALLOCATE) {
+        if (event.data.get("type") == EventEnum.ALLOCATE) {
             int max_seat_count = (int) event.data.get("max_seat_count");
             int playerCount = (int) event.data.get("player_count");
             // Utils.Log(max_seat_count + " " + playerCount);
@@ -125,9 +125,9 @@ public class PositionHandler implements ISubscriber {
 
         // Maybe tell roundPhase instead of this
         // BettingRound.PHASE roundPhase = _table.getRound().getRoundPhase();
-        BettingRound.PHASE roundPhase = BettingRound.PHASE.STASIS;
+        BettingRound.PhaseEnum roundPhase = BettingRound.PhaseEnum.STASIS;
 
-        if (roundPhase == BettingRound.PHASE.STASIS) {
+        if (roundPhase == BettingRound.PhaseEnum.STASIS) {
             // Release all players waiting to exit table
             for (PositionEnum positionName : _waiting_release_used) {
                 releaseUsed(positionName);

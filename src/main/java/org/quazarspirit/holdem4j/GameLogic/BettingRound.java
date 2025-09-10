@@ -10,11 +10,11 @@ import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
  *
  */
 public class BettingRound implements ISubscriber {
-    public enum Event implements IEventType {
+    public enum EventEnum implements IEventType {
         NEXT, RESET
     }
 
-    public enum PHASE {
+    public enum PhaseEnum {
         // Specific to Game.VARIANTS.TEXAS_HOLDEM / OMAHA_HOLDEM
         // TODO: Move to
 
@@ -26,13 +26,13 @@ public class BettingRound implements ISubscriber {
 
         private final int _drawCount;
 
-        PHASE(int drawCount) {
+        PhaseEnum(int drawCount) {
             _drawCount = drawCount;
         }
 
-        public PHASE getNext() {
-            return this.ordinal() < PHASE.values().length - 1
-                    ? PHASE.values()[this.ordinal() + 1]
+        public PhaseEnum getNext() {
+            return this.ordinal() < PhaseEnum.values().length - 1
+                    ? PhaseEnum.values()[this.ordinal() + 1]
                     : STASIS;
         }
 
@@ -41,19 +41,19 @@ public class BettingRound implements ISubscriber {
         }
 
         // Used for testing purpose
-        public final static PHASE[] DEFAULT = {
+        public final static PhaseEnum[] DEFAULT = {
                 PRE_FLOP, FLOP, TURN, RIVER, SHOWDOWN, STASIS
         };
 
     }
 
-    private PHASE _roundPhase = PHASE.STASIS;
+    private PhaseEnum _roundPhase = PhaseEnum.STASIS;
 
     @Override
-    public void update(Event event) {
-        if (event.getType() == BettingRound.Event.NEXT) {
+    public void update(EventEnum event) {
+        if (event.getType() == BettingRound.EventEnum.NEXT) {
             nextPhase();
-        } else if (event.getType() == BettingRound.Event.RESET) {
+        } else if (event.getType() == BettingRound.EventEnum.RESET) {
             reset();
         }
     }
@@ -63,7 +63,7 @@ public class BettingRound implements ISubscriber {
      */
     private void reset() {
         Utils.Log("Betting round reset");
-        _roundPhase = PHASE.STASIS;
+        _roundPhase = PhaseEnum.STASIS;
     }
 
     private void nextPhase() {
@@ -72,7 +72,7 @@ public class BettingRound implements ISubscriber {
         Utils.Log("Betting round next " + _roundPhase);
     }
 
-    public PHASE getPhase() {
+    public PhaseEnum getPhase() {
         return _roundPhase;
     }
 

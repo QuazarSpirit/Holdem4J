@@ -21,7 +21,7 @@ public class NullCardPile implements ICardPile {
      * @param criteria
      */
     @Override
-    public void sort(CardPile.SORT_CRITERIA criteria) {
+    public void sort(CardPile.CardCriteriaEnum criteria) {
     }
 
     /**
@@ -38,7 +38,7 @@ public class NullCardPile implements ICardPile {
      * @return
      */
     @Override
-    public String asString(CardPile.SORT_CRITERIA sortCriteria) {
+    public String asString(CardPile.CardCriteriaEnum sortCriteria) {
         return "NONE";
     }
 
@@ -56,7 +56,7 @@ public class NullCardPile implements ICardPile {
      * @return
      */
     @Override
-    public String asString(CardPile.SORT_CRITERIA sortCriteria, String separator) {
+    public String asString(CardPile.CardCriteriaEnum sortCriteria, String separator) {
         return "NONE";
     }
 

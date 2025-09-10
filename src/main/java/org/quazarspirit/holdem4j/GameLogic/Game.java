@@ -11,17 +11,17 @@ import org.quazarspirit.holdem4j.RoomLogic.Table;
  * Structured object for better handling of rules
  */
 public class Game {
-    public enum VARIANT {
+    public enum VariantEnum {
         ROYAL_HOLDEM(2, 20), TEXAS_HOLDEM(2), OMAHA_HOLDEM(4), DRAW(5);
 
         private final int _pocketCardSize;
         private int _deckSize = 52;
 
-        VARIANT(int pocketCardSize) {
+        VariantEnum(int pocketCardSize) {
             _pocketCardSize = pocketCardSize;
         }
 
-        VARIANT(int pocketCardSize, int deckSize) {
+        VariantEnum(int pocketCardSize, int deckSize) {
             this(pocketCardSize);
             _deckSize = deckSize;
         }
@@ -43,20 +43,20 @@ public class Game {
         }
     }
 
-    public enum RANK_VARIANT {
+    public enum RankVariantEnum {
         HIGH, HIGH_LOW, LOW
     }
 
-    public enum BET_STRUCTURE {
+    public enum BetStructureEnum {
         FIXED_LIMIT, POT_LIMIT, NO_LIMIT
     }
 
-    public enum MAX_SEATS {
+    public enum MaxSeatsEnum {
         HEADS_UP(2), SHORT_HANDED(6), FULL_RING(10);
 
         private final int _seats;
 
-        MAX_SEATS(int seats) {
+        MaxSeatsEnum(int seats) {
             _seats = seats;
         }
 
@@ -65,11 +65,11 @@ public class Game {
         }
     }
 
-    public enum PLAYER_TYPE {
+    public enum PlayerTypeEnum {
         MIXED, REAL, AI
     }
 
-    public enum FORMAT {
+    public enum FormatEnum {
         CASHGAME, SIT_AND_GO, SPIN_AND_PLAY, TOURNAMENT;
 
         public boolean canStart(Table table) {
@@ -84,12 +84,12 @@ public class Game {
         }
     }
 
-    private PLAYER_TYPE _player_type = PLAYER_TYPE.MIXED;
-    private BET_STRUCTURE _bet_structure = BET_STRUCTURE.NO_LIMIT;
-    private VARIANT _variant = VARIANT.TEXAS_HOLDEM;
-    private RANK_VARIANT _subVariant = RANK_VARIANT.HIGH;
-    private FORMAT _format = FORMAT.CASHGAME;
-    private MAX_SEATS _maxSeatsName = MAX_SEATS.FULL_RING;
+    private PlayerTypeEnum _player_type = PlayerTypeEnum.MIXED;
+    private BetStructureEnum _bet_structure = BetStructureEnum.NO_LIMIT;
+    private VariantEnum _variant = VariantEnum.TEXAS_HOLDEM;
+    private RankVariantEnum _subVariant = RankVariantEnum.HIGH;
+    private FormatEnum _format = FormatEnum.CASHGAME;
+    private MaxSeatsEnum _maxSeatsName = MaxSeatsEnum.FULL_RING;
     private int _maxStackSize = 100;
     private int _minStackSize;
     private Chip _unit;
@@ -109,30 +109,30 @@ public class Game {
         _unit = new Chip(this);
     }
 
-    public Game(VARIANT variant, BET_STRUCTURE bet_structure) {
+    public Game(VariantEnum variant, BetStructureEnum bet_structure) {
         _bet_structure = bet_structure;
         _variant = variant;
 
         setStackSize(_maxStackSize);
     }
 
-    public Game(VARIANT variant, BET_STRUCTURE bet_structure, int maxStackSize) {
+    public Game(VariantEnum variant, BetStructureEnum bet_structure, int maxStackSize) {
         this(variant, bet_structure);
         setStackSize(maxStackSize);
     }
 
-    public Game(VARIANT variant, BET_STRUCTURE bet_structure, PLAYER_TYPE playerType) {
+    public Game(VariantEnum variant, BetStructureEnum bet_structure, PlayerTypeEnum playerType) {
         this(variant, bet_structure);
         _player_type = playerType;
     }
 
-    public Game(VARIANT variant, BET_STRUCTURE bet_structure, int maxStackSize, MAX_SEATS maxSeats) {
+    public Game(VariantEnum variant, BetStructureEnum bet_structure, int maxStackSize, MaxSeatsEnum maxSeats) {
         this(variant, bet_structure, maxStackSize);
         _maxSeatsName = maxSeats;
     }
 
-    public Game(VARIANT variant, BET_STRUCTURE bet_structure, int maxStackSize, MAX_SEATS maxSeats,
-            PLAYER_TYPE playerType) {
+    public Game(VariantEnum variant, BetStructureEnum bet_structure, int maxStackSize, MaxSeatsEnum maxSeats,
+            PlayerTypeEnum playerType) {
         this(variant, bet_structure, maxStackSize, maxSeats);
         _player_type = playerType;
     }
@@ -141,12 +141,12 @@ public class Game {
         this();
 
         // Only set arguments when not null
-        Optional.ofNullable(configLoader.getEnumValue("variant", Game.VARIANT.class))
+        Optional.ofNullable(configLoader.getEnumValue("variant", Game.VariantEnum.class))
                 .ifPresent(value -> this._variant = value);
 
-        Optional.ofNullable(configLoader.getEnumValue("betStructure", Game.BET_STRUCTURE.class))
+        Optional.ofNullable(configLoader.getEnumValue("betStructure", Game.BetStructureEnum.class))
                 .ifPresent(value -> this._bet_structure = value);
-        Optional.ofNullable(configLoader.getEnumValue("maxSeats", Game.MAX_SEATS.class))
+        Optional.ofNullable(configLoader.getEnumValue("maxSeats", Game.MaxSeatsEnum.class))
                 .ifPresent(value -> this._maxSeatsName = value);
 
     }
@@ -156,19 +156,19 @@ public class Game {
         _minStackSize = _maxStackSize / 5;
     }
 
-    public BET_STRUCTURE getBetStructure() {
+    public BetStructureEnum getBetStructure() {
         return _bet_structure;
     }
 
-    public VARIANT getGameVariant() {
+    public VariantEnum getGameVariant() {
         return _variant;
     }
 
-    public FORMAT getFormat() {
+    public FormatEnum getFormat() {
         return _format;
     }
 
-    public PLAYER_TYPE getPlayerType() {
+    public PlayerTypeEnum getPlayerType() {
         return _player_type;
     }
 
