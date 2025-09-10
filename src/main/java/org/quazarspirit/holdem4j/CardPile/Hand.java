@@ -3,13 +3,11 @@ package org.quazarspirit.holdem4j.CardPile;
 import org.quazarspirit.holdem4j.Card;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
-import org.quazarspirit.holdem4j.RoomLogic.PositionHandler;
 import org.quazarspirit.holdem4j.RoomLogic.Table;
 
 import java.util.ArrayList;
 
 public class Hand extends CardPile {
-    static protected final int _maxSize = 5;
 
     public enum RankEnum {
         NONE(-1), CARD_HIGH(0.9953015), PAIR(1.366477),
@@ -28,51 +26,26 @@ public class Hand extends CardPile {
         }
     }
 
-    @Override
-    public void init() {
-    }
-
-    public Hand() {
-        super();
+    public Hand(int handMaxSize) {
+        super(handMaxSize);
     }
 
     public Hand(Hand hand) {
-        super();
+        super(hand._maxSize);
         this.cards.clear();
         this.cards.addAll(hand.cards);
     }
 
     public Hand(CardPile cardPile, int fromIndex) {
-        super();
+        super(cardPile._maxSize);
         this.cards.clear();
-        this.cards.addAll(cardPile.cards.subList(fromIndex, fromIndex + Hand._maxSize));
-    }
-
-    @Override
-    public int getMaxSize() {
-        return Hand._maxSize;
-    }
-
-    /**
-     * Methods that cast cardPile to hand
-     * 
-     * @param board Board
-     * @return hand
-     */
-    private Hand createHand(Board board) {
-        Hand hand = new Hand();
-        hand.cards.addAll(board.cards);
-        return hand;
+        this.cards.addAll(cardPile.cards.subList(fromIndex, fromIndex + cardPile._maxSize));
     }
 
     RankEnum computeRank(Table table, PositionEnum _name) {
         Board board = table.getBoard();
         IPlayer player = table.getPlayerFromPosition(_name);
         ICardPile cardPile = table.getPocketCards(player);
-
-        if (cardPile.equals(NullCardPile.GetSingleton())) {
-            return RankEnum.NONE;
-        }
 
         PocketCards pocketCards = (PocketCards) cardPile;
 

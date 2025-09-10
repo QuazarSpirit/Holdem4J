@@ -3,12 +3,11 @@ package org.quazarspirit.holdem4j.CardPile;
 import org.quazarspirit.holdem4j.Card;
 
 public class DiscardPile extends CardPile {
-    static final protected int maxSize = 52;
-
-    @Override
-    public void init() {
-
+    DiscardPile(int deckMaxSize) {
+        super(deckMaxSize);
     }
+
+    static final protected int maxSize = 52;
 
     public boolean pushCard(Card card) {
         // Needs to be moved in rule

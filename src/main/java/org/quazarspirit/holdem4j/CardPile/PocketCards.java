@@ -3,10 +3,8 @@ package org.quazarspirit.holdem4j.CardPile;
 import org.quazarspirit.holdem4j.Card;
 
 public class PocketCards extends CardPile {
-    static protected int maxSize = 2;
-
-    @Override
-    public void init() {
+    PocketCards(int deckMaxSize) {
+        super(deckMaxSize);
     }
 
     void fold(Deck deck) {

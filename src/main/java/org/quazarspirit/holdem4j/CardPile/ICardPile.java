@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import org.quazarspirit.holdem4j.Card;
 
 public interface ICardPile {
-    public void init();
-
     public ArrayList<Card> getCards();
 
     /**

@@ -21,28 +21,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DealerTest extends TestLifecycle {
     static final Game testGame = new Game(Game.VARIANT.TEXAS_HOLDEM, Game.BET_STRUCTURE.NO_LIMIT, Game.PLAYER_TYPE.AI);
 
-    DealerTest() { System.setProperty("TEST", "true"); }
+    DealerTest() {
+        System.setProperty("TEST", "true");
+    }
 
     private void testPocketCards(ArrayList<IPlayer> iPlayers, Deck deck, Table table) {
-        for (int i = 0; i < iPlayers.size(); i+=1) {
+        for (int i = 0; i < iPlayers.size(); i += 1) {
             IPlayer iPlayer = iPlayers.get(i);
             ICardPile pCards = table.getPocketCards(iPlayer);
 
             Utils.Log(pCards.asString());
 
-            if (!pCards.equals(NullCardPile.GetSingleton())) {
-                PocketCards pocketCards = (PocketCards) pCards;
-                PocketCards expectedPocketCards = new PocketCards();
-                expectedPocketCards.pushCard(deck.getCardAt(i));
-                expectedPocketCards.pushCard(deck.getCardAt(i + iPlayers.size()));
-                assertTrue(pocketCards.equals(expectedPocketCards));
-            }
+            PocketCards pocketCards = (PocketCards) pCards;
+            PocketCards expectedPocketCards = new PocketCards();
+            expectedPocketCards.pushCard(deck.getCardAt(i));
+            expectedPocketCards.pushCard(deck.getCardAt(i + iPlayers.size()));
+            assertTrue(pocketCards.equals(expectedPocketCards));
         }
     }
 
     @Test
     void deal() {
-        for(int j = 0; j <= Game.MAX_SEATS.FULL_RING.toInt(); j+=1) {
+        for (int j = 0; j <= Game.MAX_SEATS.FULL_RING.toInt(); j += 1) {
             ArrayList<IPlayer> iPlayers = new ArrayList<>();
             Table table = TableTest.initTableWithPlayers(iPlayers, j, testGame);
             Deck deck = new Deck(testGame);
@@ -54,11 +54,11 @@ class DealerTest extends TestLifecycle {
 
     @Test
     void draw() {
-       for(int j = 0; j <= Game.MAX_SEATS.FULL_RING.toInt(); j+=1) {
+        for (int j = 0; j <= Game.MAX_SEATS.FULL_RING.toInt(); j += 1) {
             ArrayList<IPlayer> iPlayers = new ArrayList<>();
             Table table = TableTest.initTableWithPlayers(iPlayers, j, testGame);
             Dealer dealer = table.getDealer();
-            for(BettingRound.PHASE roundPhase: BettingRound.PHASE.values()) {
+            for (BettingRound.PHASE roundPhase : BettingRound.PHASE.values()) {
                 dealer.draw(roundPhase.getDrawCount());
             }
 
@@ -68,7 +68,7 @@ class DealerTest extends TestLifecycle {
 
     @Test
     void playOneTableRound() {
-        final ArrayList<BettingRound.PHASE> staticHistory = new ArrayList<>(){
+        final ArrayList<BettingRound.PHASE> staticHistory = new ArrayList<>() {
             {
                 add(BettingRound.PHASE.PRE_FLOP);
                 add(BettingRound.PHASE.FLOP);
@@ -78,14 +78,15 @@ class DealerTest extends TestLifecycle {
                 add(BettingRound.PHASE.STASIS);
             }
         };
-        class SubscriberTest implements ISubscriber{
+        class SubscriberTest implements ISubscriber {
             private final ArrayList<BettingRound.PHASE> _history = new ArrayList<>();
+
             @Override
             public void update(Event event) {
-                if(event.data.get("type") == BettingRound.EVENT.NEXT) {
+                if (event.data.get("type") == BettingRound.EVENT.NEXT) {
                     BettingRound.PHASE roundPhase = (BettingRound.PHASE) event.data.get("round_phase");
                     if (_history.size() > 0) {
-                        if (roundPhase != _history.get(_history.size() -1)) {
+                        if (roundPhase != _history.get(_history.size() - 1)) {
 
                             _history.add(roundPhase);
                         }
@@ -100,7 +101,7 @@ class DealerTest extends TestLifecycle {
             }
         }
 
-        for(int j = 0; j <= Game.MAX_SEATS.FULL_RING.toInt(); j+=1) {
+        for (int j = 0; j <= Game.MAX_SEATS.FULL_RING.toInt(); j += 1) {
             ArrayList<IPlayer> iPlayers = new ArrayList<>();
             Table table = TableTest.initTableWithPlayers(iPlayers, j, testGame);
 
@@ -112,7 +113,7 @@ class DealerTest extends TestLifecycle {
 
             int playerCount = iPlayers.size();
 
-            for(BettingRound.PHASE roundPhase: BettingRound.PHASE.values()) {
+            for (BettingRound.PHASE roundPhase : BettingRound.PHASE.values()) {
                 dealer.playRoundPhase();
                 if (roundPhase == BettingRound.PHASE.PRE_FLOP) {
                     testPocketCards(iPlayers, deck, table);
@@ -142,19 +143,31 @@ class DealerTest extends TestLifecycle {
         // Fold stays in any case and depending on aggressive play
         // or not you can't check and bet or call and raise
         ArrayList<PLAYER_ACTION> aggressive_history_1 = new ArrayList<>() {
-            { add(PLAYER_ACTION.BET); }
+            {
+                add(PLAYER_ACTION.BET);
+            }
         };
 
         ArrayList<PLAYER_ACTION> aggressive_history_2 = new ArrayList<>() {
-            { add(PLAYER_ACTION.RAISE); }
+            {
+                add(PLAYER_ACTION.RAISE);
+            }
         };
 
         ArrayList<PLAYER_ACTION> aggressive_allowed = new ArrayList<>() {
-            { add(PLAYER_ACTION.FOLD); add(PLAYER_ACTION.CALL); add(PLAYER_ACTION.RAISE); }
+            {
+                add(PLAYER_ACTION.FOLD);
+                add(PLAYER_ACTION.CALL);
+                add(PLAYER_ACTION.RAISE);
+            }
         };
 
         ArrayList<PLAYER_ACTION> passive_history = new ArrayList<>() {
-            { add(PLAYER_ACTION.CHECK); add(PLAYER_ACTION.CALL); add(PLAYER_ACTION.FOLD); }
+            {
+                add(PLAYER_ACTION.CHECK);
+                add(PLAYER_ACTION.CALL);
+                add(PLAYER_ACTION.FOLD);
+            }
         };
         ArrayList<PLAYER_ACTION> passive_allowed = new ArrayList<>() {
             {
@@ -177,7 +190,7 @@ class DealerTest extends TestLifecycle {
         Table table = TableTest.initTableWithPlayers(iPlayers, 10, testGame);
         Dealer dealer = table.getDealer();
 
-        for (Map.Entry<ArrayList<PLAYER_ACTION>, ArrayList<PLAYER_ACTION>> set: testValues.entrySet()) {
+        for (Map.Entry<ArrayList<PLAYER_ACTION>, ArrayList<PLAYER_ACTION>> set : testValues.entrySet()) {
             assertEquals(dealer.fillAllowedAction(set.getKey()), set.getValue());
         }
     }

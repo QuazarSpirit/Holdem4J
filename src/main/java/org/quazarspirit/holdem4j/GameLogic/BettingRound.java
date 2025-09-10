@@ -4,7 +4,6 @@ import org.quazarspirit.Utils.Utils;
 import org.quazarspirit.Utils.PubSub.Event;
 import org.quazarspirit.Utils.PubSub.IEventType;
 import org.quazarspirit.Utils.PubSub.ISubscriber;
-import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
 
 /**
  *
@@ -49,8 +48,7 @@ public class BettingRound implements ISubscriber {
 
     private PhaseEnum _roundPhase = PhaseEnum.STASIS;
 
-    @Override
-    public void update(EventEnum event) {
+    public void update(Event event) {
         if (event.getType() == BettingRound.EventEnum.NEXT) {
             nextPhase();
         } else if (event.getType() == BettingRound.EventEnum.RESET) {
@@ -74,11 +72,5 @@ public class BettingRound implements ISubscriber {
 
     public PhaseEnum getPhase() {
         return _roundPhase;
-    }
-
-    @Override
-    public void update(org.quazarspirit.Utils.PubSub.Event event) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 }

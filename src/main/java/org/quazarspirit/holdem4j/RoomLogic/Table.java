@@ -5,7 +5,6 @@ import org.quazarspirit.Utils.Utils;
 import org.quazarspirit.Utils.PubSub.*;
 import org.quazarspirit.holdem4j.CardPile.Board;
 import org.quazarspirit.holdem4j.CardPile.ICardPile;
-import org.quazarspirit.holdem4j.CardPile.NullCardPile;
 import org.quazarspirit.holdem4j.CardPile.PocketCards;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
 import org.quazarspirit.holdem4j.GameLogic.Game;
@@ -136,15 +135,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     }
 
     public ICardPile getPocketCards(IPlayer player) {
-        final ICardPile NCP = NullCardPile.GetSingleton();
-        if (player.equals(NullPlayer.GetSingleton())) {
-            return NCP;
-        }
-
         ICardPile cardPile = playersPocketCard.get(player);
-        if (cardPile == null) {
-            return NCP;
-        }
 
         return cardPile;
     }

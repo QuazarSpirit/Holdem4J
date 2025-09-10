@@ -12,7 +12,7 @@ public abstract class CardPile implements ICardPile {
         RANK, COLOR, VALUE
     }
 
-    private static int _maxSize = 52;
+    protected int _maxSize = 52;
     protected final ArrayList<Card> cards = new ArrayList<Card>();
 
     CardPile(int deckMaxSize) {
@@ -53,7 +53,7 @@ public abstract class CardPile implements ICardPile {
 
     @Override
     public int getMaxSize() {
-        return CardPile._maxSize;
+        return this._maxSize;
     }
 
     @Override
@@ -75,6 +75,10 @@ public abstract class CardPile implements ICardPile {
         for (Card card : iCardPile.getCards()) {
             pushCard(card);
         }
+    }
+
+    public ArrayList<Card> getCards() {
+        return this.cards;
     }
 
     public Card getCardAt(int index) {
@@ -175,6 +179,4 @@ public abstract class CardPile implements ICardPile {
     public void clear() {
         cards.clear();
     }
-
-    public abstract void init();
 }

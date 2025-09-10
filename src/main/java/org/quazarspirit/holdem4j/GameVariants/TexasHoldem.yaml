@@ -1,0 +1,16 @@
+name: TexasHoldem
+pocket_card_size: 2
+board_card_size: 5
+card_ranks: 23456789TJQKA
+card_colors: CDHS
+card_ranking:
+  - HIGH_CARD
+  - PAIR
+  - DOUBLE_PAIR
+  - THREE_OF_A_KIND
+  - STRAIGHT
+  - FLUSH
+  - FULL_HOUSE
+  - FOUR_OF_A_KIND
+  - STRAIGHT_FLUSH
+  - ROYAL_FLUSH

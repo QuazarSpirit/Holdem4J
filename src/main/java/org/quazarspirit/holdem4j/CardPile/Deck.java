@@ -3,34 +3,18 @@ package org.quazarspirit.holdem4j.CardPile;
 import java.util.Random;
 
 import org.quazarspirit.holdem4j.Card;
-import org.quazarspirit.holdem4j.GameLogic.Game;
 
 public class Deck extends CardPile {
-    protected final DiscardPile discardPile = new DiscardPile();
+    protected final DiscardPile discardPile;
 
-    /**
-     * Create deck of 52 cards and initialize it.
-     */
-    public Deck() {
-        super();
-        init();
+    public Deck(int deckMaxSize) {
+        super(deckMaxSize);
+        this.discardPile = new DiscardPile(deckMaxSize);
     }
 
-    /**
-     * Create deck with defined game structure.
-     */
-    public Deck(Game game) {
-        super(game.getGameVariant().getDeckSize());
-        init(game.getGameVariant().getCardRanks());
-    }
-
-    /**
-     * Return a deck with default card in regular poker game mode.<br>
-     * This means all cards from 2 to Ace and all colors
-     */
-    @Override
-    public void init() {
-        init(Card.RANKS);
+    public Deck(String cardRankRange, String cardColorRange) throws CardPileOverflowException {
+        this(cardRankRange.length() * cardColorRange.length());
+        init(cardRankRange, cardColorRange);
     }
 
     /**
@@ -39,13 +23,21 @@ public class Deck extends CardPile {
      * NOTE: This methods does <b>NOT</b> shuffle cards !
      * 
      * @param cardRange subString of valid ranks (eg: A2345)
+     * @throws CardPileOverflowException
      */
-    public void init(String cardRange) {
+    public void init(String cardRankRange, String cardColorRange) throws CardPileOverflowException {
         cards.clear();
 
-        for (char color : Card.COLORS.toCharArray()) {
-            for (char rank : cardRange.toCharArray()) {
-                Card c = new Card(("" + rank + color));
+        char[] colors = cardColorRange.toCharArray();
+        char[] ranks = cardRankRange.toCharArray();
+
+        if (colors.length * ranks.length > this._maxSize) {
+            throw new CardPileOverflowException();
+        }
+
+        for (char color : colors) {
+            for (char rank : ranks) {
+                Card c = new Card.Builder().color(Character.toString(color)).rank(Character.toString(rank)).build();
                 cards.add(c);
             }
         }
@@ -58,7 +50,7 @@ public class Deck extends CardPile {
      */
     public Deck shuffle() {
         Deck initialDeck = this;
-        Deck shuffledDeck = new Deck();
+        Deck shuffledDeck = new Deck(this._maxSize);
         shuffledDeck.clear();
 
         Random r = new Random();
@@ -121,10 +113,6 @@ public class Deck extends CardPile {
      * @param iCardPile Card pile to discard.
      */
     public void discard(ICardPile iCardPile) {
-        if (iCardPile == NullCardPile.GetSingleton()) {
-            return;
-        }
-
         CardPile cardPile = (CardPile) iCardPile;
         for (Card card : cardPile.cards) {
             discard(card);
