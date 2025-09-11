@@ -110,4 +110,9 @@ public class Game {
                 _maxSeatsName.toString() + "\n" +
                 _maxStackSize;
     }
+
+    @Override
+    public String toString() {
+        return asString();
+    }
 }

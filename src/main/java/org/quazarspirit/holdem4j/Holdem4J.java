@@ -47,9 +47,7 @@ public class Holdem4J {
 
             // Add game to lobby
             ILobby lobby = new LobbyServer(6000);
-            // Lobby lobby = Lobby.getSingleton();
-            // lobby.addGame(game);
-
+            lobby.addGame(game);
         } catch (Exception e) {
             System.err.println("Fatal error during game setup: " + e.getMessage());
             e.printStackTrace();

@@ -1,6 +1,5 @@
 package org.quazarspirit.Utils;
 
-import java.sql.Array;
 import java.util.*;
 
 import org.quazarspirit.holdem4j.GameLogic.Game;
@@ -12,7 +11,6 @@ public class GameConfigLoader {
 
     private final Map<String, Class<? extends Enum<?>>> enumMapping = Map.of(
             "betStructure", Game.BetStructureEnum.class,
-            "gameVariant", Game.VariantEnum.class,
             "gameFormat", Game.FormatEnum.class);
 
     private final Map<String, Enum<?>> parsedValues = new HashMap<>();
