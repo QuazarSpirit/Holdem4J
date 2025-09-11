@@ -11,5 +11,6 @@ public class RealPlayer extends Player {
 
     @Override
     public void update(Event event) {
+        System.out.println("Got event: " + " " + event);
     }
 }

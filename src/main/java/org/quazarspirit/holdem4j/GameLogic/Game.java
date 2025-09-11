@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.quazarspirit.Utils.GameConfigLoader;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.Chip;
-import org.quazarspirit.holdem4j.RoomLogic.Table;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 /**
  * Structured object for better handling of rules

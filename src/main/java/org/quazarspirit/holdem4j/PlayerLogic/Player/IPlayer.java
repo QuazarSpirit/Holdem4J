@@ -3,7 +3,7 @@ package org.quazarspirit.holdem4j.PlayerLogic.Player;
 import org.json.JSONObject;
 import org.quazarspirit.Utils.PubSub.IPublisher;
 import org.quazarspirit.Utils.PubSub.ISubscriber;
-import org.quazarspirit.holdem4j.RoomLogic.Table;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 import java.util.UUID;
 

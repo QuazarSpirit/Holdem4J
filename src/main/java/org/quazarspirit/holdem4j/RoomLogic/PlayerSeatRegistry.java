@@ -13,6 +13,7 @@ import org.quazarspirit.holdem4j.PlayerLogic.Player.NullPlayer;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerSeat.IPlayerSeat;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerSeat.NullPlayerSeat;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerSeat.PlayerSeat;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 import java.util.*;
 

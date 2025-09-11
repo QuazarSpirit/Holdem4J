@@ -7,16 +7,19 @@ import org.quazarspirit.Utils.MessageQueue.Producer;
 import org.quazarspirit.Utils.PubSub.*;
 import org.quazarspirit.holdem4j.Card;
 import org.quazarspirit.holdem4j.CardPile.Board;
+import org.quazarspirit.holdem4j.CardPile.CardPileOverflowException;
 import org.quazarspirit.holdem4j.CardPile.Deck;
 import org.quazarspirit.holdem4j.CardPile.ICardPile;
 import org.quazarspirit.holdem4j.CardPile.PocketCards;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
+import org.quazarspirit.holdem4j.GameLogic.GameVariant;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.Bet;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.IBet;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.NullBet;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerActionEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 import java.net.URI;
 import java.util.*;
@@ -39,12 +42,20 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
     private BettingRound.PhaseEnum _roundPhase;
     private ArrayList<PositionEnum> _currPlayingPos = new ArrayList<>();
 
+    private Deck.Builder _deckBuilder;
+
     private final ArrayList<ImmutableKV<PlayerActionEnum, Bet>> _previousPlayerActions = new ArrayList<>();
 
-    Dealer(Table table) {
+    public Dealer(Table table) throws CardPileOverflowException {
         _table = table;
         _table.addSubscriber(this);
-        _deck = new Deck(table.getGame());
+
+        GameVariant variant = table.getGame().getVariant();
+
+        Deck.Builder _deckBuilder = new Deck.Builder()
+                .CardColorRange(variant.getCardColors())
+                .CardRankRange(variant.getCardRanks());
+        _deck = new Deck(_deckBuilder);
     }
 
     public boolean canStart() {
@@ -64,12 +75,10 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
                 return;
             }
             case PRE_FLOP -> {
-                _deck = new Deck(_table.getGame());
+                _deck = new Deck(_deckBuilder);
                 if (!Utils.IsTesting()) {
                     _deck = _deck.shuffle();
-                    Utils.Log(
-                            "New deck: " + _deck.asString(),
-                            new ImmutableKV<String, Object>("type", "GAME"));
+                    Utils.Log("New deck: " + _deck.asString());
                 }
 
                 _table.getPot().add(_table.blindBet());
@@ -221,13 +230,9 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
         ArrayList<PositionEnum> playingPositions = _table.getPlayingPositions();
         HashMap<PositionEnum, PocketCards> pocketCardsList = new HashMap<>();
 
-        Utils.Log(
-                "----------- \nPlaying positions count: " + playingPositions.size(),
-                new ImmutableKV<String, Object>("message_type", "GAME"));
+        Utils.Log("----------- \nPlaying positions count: " + playingPositions.size());
 
-        Utils.Log(
-                "Playing positions: " + playingPositions,
-                new ImmutableKV<String, Object>("message_type", "GAME"));
+        Utils.Log("Playing positions: " + playingPositions);
 
         for (PositionEnum positionName : playingPositions) {
             pocketCardsList.put(positionName, new PocketCards());

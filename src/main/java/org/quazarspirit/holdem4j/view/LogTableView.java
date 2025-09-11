@@ -5,9 +5,9 @@ import org.quazarspirit.Utils.PubSub.Event;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
-import org.quazarspirit.holdem4j.RoomLogic.ITable;
 import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
 import org.quazarspirit.holdem4j.RoomLogic.PositionHandler;
+import org.quazarspirit.holdem4j.RoomLogic.Table.ITable;
 
 import java.util.ArrayList;
 import java.util.Iterator;

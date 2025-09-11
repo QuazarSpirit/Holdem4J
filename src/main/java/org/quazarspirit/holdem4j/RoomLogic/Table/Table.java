@@ -1,9 +1,10 @@
-package org.quazarspirit.holdem4j.RoomLogic;
+package org.quazarspirit.holdem4j.RoomLogic.Table;
 
 import org.json.JSONObject;
 import org.quazarspirit.Utils.Utils;
 import org.quazarspirit.Utils.PubSub.*;
 import org.quazarspirit.holdem4j.CardPile.Board;
+import org.quazarspirit.holdem4j.CardPile.CardPileOverflowException;
 import org.quazarspirit.holdem4j.CardPile.ICardPile;
 import org.quazarspirit.holdem4j.CardPile.PocketCards;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
@@ -13,6 +14,11 @@ import org.quazarspirit.holdem4j.GameLogic.ChipPile.Stack;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.NullPlayer;
+import org.quazarspirit.holdem4j.RoomLogic.Dealer;
+import org.quazarspirit.holdem4j.RoomLogic.DealerIntentEnum;
+import org.quazarspirit.holdem4j.RoomLogic.PlayerSeatRegistry;
+import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
+import org.quazarspirit.holdem4j.RoomLogic.PlayerSeatRegistry.EventEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,13 +34,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     private final int _maxPlayerCount;
     protected boolean isOpened = true;
 
-    protected final PlayerSeatRegistry _playerSeats;
-
-    /**
-     * @deprecated replaced by {@link #_playerSeats}
-     */
-    @Deprecated
-    protected HashMap<PositionEnum, IPlayer> players = new HashMap<>();
+    protected final PlayerSeatRegistry _playerSeatRegistry;
 
     protected HashMap<IPlayer, Stack> playersStack = new HashMap<>();
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
@@ -50,8 +50,8 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         _game = game;
         _maxPlayerCount = _game.getMaxSeatsCount();
         _pot = new Pot(_game.getUnit());
-        _playerSeats = new PlayerSeatRegistry(_game);
-        this.addSubscriber(_playerSeats);
+        _playerSeatRegistry = new PlayerSeatRegistry(_game);
+        this.addSubscriber(_playerSeatRegistry);
         this.addSubscriber(_bettingRound);
         _dealer = new Dealer(this);
         _board = new Board(game.getVariant().getBoardCardSize());
@@ -59,6 +59,10 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
          * _positionHandler = new PositionHandler();
          * this.addSubscriber(_positionHandler);
          */
+    }
+
+    public void run() {
+        System.out.println(Thread.currentThread().getName());
     }
 
     // TODO: Test with multiple complete rounds
@@ -180,7 +184,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
      */
     @Deprecated
     public ArrayList<PositionEnum> getUsedPositions() {
-        return _playerSeats._positionHandler.getUsed();
+        return _playerSeatRegistry._positionHandler.getUsed();
     }
 
     /**
@@ -189,13 +193,13 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
      */
     @Deprecated
     public ArrayList<PositionEnum> getPlayingPositions() {
-        return _playerSeats._positionHandler.getPlaying();
+        return _playerSeatRegistry._positionHandler.getPlaying();
     }
 
     public boolean addPlayer(IPlayer player) {
         // Test if player is not already connected to table
         // or that the table is currently opened
-        if (_playerSeats._containsPlayer(player) || !isOpened) {
+        if (_playerSeatRegistry._containsPlayer(player) || !isOpened) {
             return false;
         }
 
@@ -209,7 +213,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         }
 
         if (_bettingRound.getPhase() == BettingRound.PhaseEnum.STASIS) {
-            _playerSeats.add(player);
+            _playerSeatRegistry.add(player);
 
             _dealer.addSubscriber(player);
             player.addSubscriber(_dealer);
@@ -235,15 +239,12 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             isOpened = true;
         }
 
-        if (!_playerSeats._containsPlayer(player)) {
+        if (!_playerSeatRegistry._containsPlayer(player)) {
             return;
         }
 
         if (_bettingRound.getPhase() == BettingRound.PhaseEnum.STASIS) {
-            PositionEnum positionToRemove = getPositionFromPlayer(player);
-            players.remove(positionToRemove);
-
-            _playerSeats.remove(player);
+            _playerSeatRegistry.remove(player);
 
             playersPocketCard.remove(player);
             _dealer.removeSubscriber(player);
@@ -263,7 +264,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     }
 
     public int getPlayerCount() {
-        return _playerSeats.size();
+        return _playerSeatRegistry.size();
     }
 
     public int getMaxPlayerCount() {
@@ -352,7 +353,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     }
 
     public IPlayer getPlayerFromSeatNumber(int seatNumber) {
-        return _playerSeats.getPlayerFromSeatNumber(seatNumber);
+        return _playerSeatRegistry.getPlayerFromSeatNumber(seatNumber);
     }
 
     /**

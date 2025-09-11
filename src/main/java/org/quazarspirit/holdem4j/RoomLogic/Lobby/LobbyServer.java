@@ -9,8 +9,8 @@ import org.json.JSONObject;
 import org.quazarspirit.holdem4j.GameLogic.Game;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.RealPlayer;
-import org.quazarspirit.holdem4j.RoomLogic.ITable;
-import org.quazarspirit.holdem4j.RoomLogic.Table;
+import org.quazarspirit.holdem4j.RoomLogic.Table.ITable;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -115,16 +115,33 @@ public class LobbyServer implements ILobby {
     public void joinGame(IPlayer player, Game game) {
         // There is no tables registered for a game by default
         if (_tables.get(game) == null) {
-            ITable table = new Table(game);
             _tables.put(game, new ArrayList<ITable>());
-            addTableForGame(game, table);
+            createNewTableForGame(game);
         }
 
-        // Check if there is a table available
+        // Now we know there is a table
+        ArrayList<ITable> tables = _tables.get(game);
+
+        // Table has the responsability to handle player count, we can just try to join
+        // every table and stop we addPlayer is true
+        // If we dont have any table available, create a new one
+        boolean playerJoined = false;
+        for (ITable table : tables) {
+            if (table.addPlayer(player)) {
+                playerJoined = true;
+                break;
+            }
+        }
+
+        if (!playerJoined) {
+            createNewTableForGame(game).addPlayer(player);
+        }
     }
 
-    private void addTableForGame(Game game, ITable table) {
+    private ITable createNewTableForGame(Game game) {
+        ITable table = new Table(game);
         _tables.get(game).add(table);
+        return table;
     }
 
     @Override

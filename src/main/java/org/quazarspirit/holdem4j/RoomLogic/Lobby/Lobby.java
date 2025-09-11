@@ -7,7 +7,7 @@ import org.quazarspirit.Utils.PubSub.ISubscriber;
 import org.quazarspirit.holdem4j.GameLogic.Game;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
-import org.quazarspirit.holdem4j.RoomLogic.Table;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 import org.quazarspirit.holdem4j.View.LogTableView;
 
 import java.util.*;
@@ -17,7 +17,7 @@ import java.util.*;
  * Add player to these tables
  * Create bot to fill those tables
  */
-public class Lobby implements ISubscriber {
+public class Lobby implements ILobby, ISubscriber {
     public static final Lobby Singleton = new Lobby();
     private final ArrayList<Game> _games = new ArrayList<>() {
     };

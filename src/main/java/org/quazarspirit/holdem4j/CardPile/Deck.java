@@ -12,9 +12,19 @@ public class Deck extends CardPile {
         this.discardPile = new DiscardPile(deckMaxSize);
     }
 
-    public Deck(String cardRankRange, String cardColorRange) throws CardPileOverflowException {
+    public Deck(String cardRankRange, String cardColorRange) {
         this(cardRankRange.length() * cardColorRange.length());
-        init(cardRankRange, cardColorRange);
+
+        try {
+            init(cardRankRange, cardColorRange);
+        } catch (CardPileOverflowException e) {
+            // This case is impossible
+            System.exit(-2);
+        }
+    }
+
+    public Deck(Builder builder) {
+        this(builder._cardRankRange, builder._cardColorRange);
     }
 
     /**
@@ -124,5 +134,20 @@ public class Deck extends CardPile {
      */
     public DiscardPile getDiscardPile() {
         return discardPile;
+    }
+
+    public static class Builder {
+        private String _cardRankRange;
+        private String _cardColorRange;
+
+        public Builder CardRankRange(String cardRankRange) {
+            _cardRankRange = cardRankRange;
+            return this;
+        }
+
+        public Builder CardColorRange(String cardColorRange) {
+            _cardColorRange = cardColorRange;
+            return this;
+        }
     }
 }

@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import org.quazarspirit.Utils.PubSub.IPublisher;
 import org.quazarspirit.Utils.PubSub.ISubscriber;
 import org.quazarspirit.Utils.PubSub.Publisher;
-import org.quazarspirit.holdem4j.RoomLogic.Table;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 import java.util.ArrayList;
 import java.util.Objects;

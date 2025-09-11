@@ -3,7 +3,7 @@ package org.quazarspirit.holdem4j.GameLogic.ChipPile;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
 import org.quazarspirit.holdem4j.GameLogic.Game;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
-import org.quazarspirit.holdem4j.RoomLogic.Table;
+import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
 
 public class Bet extends ChipCount implements IBet {
     private Bet(Game game, int count) {
