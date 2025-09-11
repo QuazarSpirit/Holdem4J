@@ -3,7 +3,7 @@ package org.quazarspirit.holdem4j.CardPile;
 import org.quazarspirit.holdem4j.Card;
 
 public class DiscardPile extends CardPile {
-    DiscardPile(int deckMaxSize) {
+    public DiscardPile(int deckMaxSize) {
         super(deckMaxSize);
     }
 

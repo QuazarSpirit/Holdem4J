@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Table implements ITable, ISubscriber, IPublisher {
+public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     public enum EventEnum implements IEventType {
         TIMEOUT, POT_ADD, POT_RESET;
     }
@@ -40,7 +40,7 @@ public class Table implements ITable, ISubscriber, IPublisher {
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
     final private Dealer _dealer;
     final private BettingRound _bettingRound = new BettingRound();
-    final private Board _board = new Board();
+    final private Board _board;
     final private Pot _pot;
     final private Game _game;
 
@@ -54,6 +54,7 @@ public class Table implements ITable, ISubscriber, IPublisher {
         this.addSubscriber(_playerSeats);
         this.addSubscriber(_bettingRound);
         _dealer = new Dealer(this);
+        _board = new Board(game.getVariant().getBoardCardSize());
         /*
          * _positionHandler = new PositionHandler();
          * this.addSubscriber(_positionHandler);
@@ -220,7 +221,7 @@ public class Table implements ITable, ISubscriber, IPublisher {
 
         }
 
-        playersPocketCard.put(player, new PocketCards());
+        playersPocketCard.put(player, new PocketCards(_game.getVariant().getPocketCardSize()));
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", PlayerIntentEnum.JOIN);

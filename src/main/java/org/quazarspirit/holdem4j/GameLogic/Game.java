@@ -76,6 +76,10 @@ public class Game {
         _minStackSize = _maxStackSize / 5;
     }
 
+    public GameVariant getVariant() {
+        return _variant;
+    }
+
     public BetStructureEnum getBetStructure() {
         return _bet_structure;
     }
