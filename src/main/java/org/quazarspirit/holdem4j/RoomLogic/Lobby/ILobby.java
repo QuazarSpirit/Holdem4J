@@ -1,7 +1,5 @@
 package org.quazarspirit.holdem4j.RoomLogic.Lobby;
 
-import java.util.Set;
-
 import org.quazarspirit.holdem4j.GameLogic.Game;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 
@@ -25,5 +23,5 @@ public interface ILobby {
     /**
      * @return List of available games
      */
-    public Set<Game> getGames();
+    public Object getGames();
 }

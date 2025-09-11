@@ -3,11 +3,9 @@ package org.quazarspirit.holdem4j.RoomLogic.Lobby;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.json.JSONObject;
-import org.quazarspirit.Utils.Utils;
 import org.quazarspirit.holdem4j.GameLogic.Game;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.RealPlayer;
@@ -18,6 +16,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 public class LobbyServer implements ILobby {
+    final private HashMap<UUID, Game> _games = new HashMap<>();
     final private HashMap<Game, ArrayList<ITable>> _tables = new HashMap<>();
 
     private HashMap<UUID, IPlayer> _players = new HashMap<UUID, IPlayer>();
@@ -30,37 +29,33 @@ public class LobbyServer implements ILobby {
         Javalin app = Javalin.create().start(port);
 
         app.exception(Exception.class, (e, ctx) -> {
-            Utils.Log("Erreur serveur : " + e); // Log complet avec stacktrace
-            ctx.status(500).json(Map.of("error", "Erreur interne du serveur"));
+            e.printStackTrace();
+            ctx.status(500).json(Map.of("error", "Internal server error"));
         });
 
         app.get("/", ctx -> ctx.result("Hello there !"));
         app.post("/register", ctx -> registerPlayer(ctx));
 
         app.get("/get_player_data/{uuid}", ctx -> {
-            String uuid = ctx.pathParam("uuid");
-            ctx.json(fetchPlayer(UUID.fromString(uuid)));
+            ctx.json(fetchPlayer(UUID.fromString(ctx.pathParam("uuid"))));
         });
 
         app.get("/get_games", ctx -> {
-            System.out.println(getGames());
             ctx.json(getGames());
         });
 
-        app.post("/data", ctx -> {
-            String body = ctx.body();
-            ctx.result("Données reçues : " + body);
+        app.post("/join_game", ctx -> {
+            joinGameFromRequest(ctx);
         });
     }
 
     /**
      * Basing player registration, no auth, nothing
      * 
-     * @param context
+     * @param ctx
      */
-    private void registerPlayer(Context context) {
-        String body = context.body();
-        System.out.println(body);
+    private void registerPlayer(Context ctx) {
+        String body = ctx.body();
 
         try {
             JSONObject json = new JSONObject(body);
@@ -68,14 +63,40 @@ public class LobbyServer implements ILobby {
 
             IPlayer player = new RealPlayer(UUID.randomUUID(), username);
             _players.put(player.getUUID(), player);
-            context.json(player);
+            ctx.json(player);
         } catch (ClassCastException e) {
-            context.status(403);
-            context.result("Your username needs to be a string !");
+            ctx.status(403);
+            ctx.result("Your username needs to be a string !");
         } catch (Exception e) {
             System.err.println(e);
-            context.status(403);
-            context.result("You need to specify a username !");
+            ctx.status(403);
+            ctx.result("You need to specify a username !");
+        }
+    }
+
+    private void joinGameFromRequest(Context ctx) {
+        String body = ctx.body();
+
+        try {
+            JSONObject json = new JSONObject(body);
+            String playerUuid = (String) json.get("player_uuid");
+            IPlayer player = fetchPlayer(UUID.fromString(playerUuid));
+            if (player == null) {
+                ctx.json(Map.of("error", "Player not found"));
+                return;
+            }
+
+            String gameUuid = (String) json.get("game_uuid");
+            Game game = _games.get(UUID.fromString(gameUuid));
+            if (game == null) {
+                ctx.json(Map.of("error", "Game not found"));
+                return;
+            }
+
+            ctx.result("Joined game : " + game);
+            joinGame(player, game);
+        } catch (ClassCastException e) {
+            ctx.status(500).json(Map.of("error", "Can't join games with specified params"));
         }
     }
 
@@ -86,6 +107,7 @@ public class LobbyServer implements ILobby {
     @Override
     public void addGame(Game game) {
         System.out.println("Adding game to lobby");
+        _games.put(UUID.randomUUID(), game);
         _tables.put(game, null);
     }
 
@@ -106,8 +128,7 @@ public class LobbyServer implements ILobby {
     }
 
     @Override
-    public Set<Game> getGames() {
-        System.out.println(_tables.keySet());
-        return _tables.keySet();
+    public HashMap<UUID, Game> getGames() {
+        return _games;
     }
 }
