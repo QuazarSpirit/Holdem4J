@@ -1,7 +1,5 @@
 package org.quazarspirit.holdem4j.GameLogic.ChipPile;
 
-import org.quazarspirit.holdem4j.GameLogic.Game;
-
 public class NullBet implements IBet {
     private static NullBet _singleton;
 

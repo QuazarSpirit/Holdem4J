@@ -15,7 +15,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class HttpLobby {
+public class HttpLobby implements ILobby {
     private static HttpLobby instance;
     private static int sPort = 8080;
     final int port;

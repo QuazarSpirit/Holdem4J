@@ -20,10 +20,8 @@ import java.util.*;
 public class Lobby implements ISubscriber {
     public static final Lobby Singleton = new Lobby();
     private final ArrayList<Game> _games = new ArrayList<>() {
-        {
-            add(new Game(Game.VariantEnum.TEXAS_HOLDEM, Game.BetStructureEnum.NO_LIMIT, 10));
-        }
     };
+
     private final HashMap<Game, ArrayList<Table>> _gameToTables = new HashMap<>();
 
     private Lobby() {

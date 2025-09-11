@@ -1,6 +1,7 @@
 name: TexasHoldem
 pocket_card_size: 2
 board_card_size: 5
+max_seats: 6
 card_ranks: TJQKA
 card_colors: CDHS
 card_ranking:

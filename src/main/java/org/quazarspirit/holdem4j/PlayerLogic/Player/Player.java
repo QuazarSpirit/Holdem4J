@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
-abstract class Player implements IPlayer, ISubscriber, IPublisher {
+abstract class Player implements IPlayer {
     private final UUID _uuid;
     protected final String username;
     private final ArrayList<Table> _tables = new ArrayList<>();

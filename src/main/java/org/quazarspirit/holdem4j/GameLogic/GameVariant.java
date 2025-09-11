@@ -2,19 +2,19 @@ package org.quazarspirit.holdem4j.GameLogic;
 
 public class GameVariant {
     private int _pocketCardSize;
-    private int _deckSize;
+    private int _boardCardSize;
     private String _cardRanks;
     private String _cardColors;
 
     private GameVariant(Builder builder) {
-        this._deckSize = builder._deckSize;
+        this._boardCardSize = builder._boardCardSize;
         this._pocketCardSize = builder._pocketCardSize;
         this._cardRanks = builder._cardRanks;
         this._cardColors = builder._cardColors;
     }
 
-    public int getDeckSize() {
-        return _deckSize;
+    public int getBoardCardSize() {
+        return _boardCardSize;
     }
 
     public int getPocketCardSize() {
@@ -29,19 +29,26 @@ public class GameVariant {
         return _cardRanks;
     }
 
+    @Override
+    public String toString() {
+        return "Pocket card size: " + _pocketCardSize
+                + " Board card size: " + _boardCardSize
+                + " Deck size: " + (_cardRanks.length() * _cardColors.length());
+    }
+
     public static class Builder {
         private int _pocketCardSize;
-        private int _deckSize;
+        private int _boardCardSize;
         private String _cardRanks;
         private String _cardColors;
 
-        public Builder color(int pocketCardSize) {
+        public Builder pocketCardSize(int pocketCardSize) {
             this._pocketCardSize = pocketCardSize;
             return this;
         }
 
-        public Builder rank(int deckSize) {
-            this._deckSize = deckSize;
+        public Builder boardCardSize(int boardCardSize) {
+            this._boardCardSize = boardCardSize;
             return this;
         }
 

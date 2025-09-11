@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Table extends Thread implements ITable, ISubscriber, IPublisher {
+public class Table implements ITable, ISubscriber, IPublisher {
     public enum EventEnum implements IEventType {
         TIMEOUT, POT_ADD, POT_RESET;
     }

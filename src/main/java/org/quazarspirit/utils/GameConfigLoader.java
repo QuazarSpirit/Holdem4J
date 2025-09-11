@@ -1,12 +1,14 @@
 package org.quazarspirit.Utils;
 
+import java.sql.Array;
 import java.util.*;
 
 import org.quazarspirit.holdem4j.GameLogic.Game;
+import org.quazarspirit.holdem4j.GameLogic.GameVariant;
 
 public class GameConfigLoader {
 
-    private Properties config = new Properties();
+    private Map<String, Object> config;
 
     private final Map<String, Class<? extends Enum<?>>> enumMapping = Map.of(
             "betStructure", Game.BetStructureEnum.class,
@@ -15,9 +17,40 @@ public class GameConfigLoader {
 
     private final Map<String, Enum<?>> parsedValues = new HashMap<>();
 
-    public GameConfigLoader(Properties config) {
+    public GameConfigLoader(Map<String, Object> config) {
         this.config = config;
         parseEnums();
+        init();
+    }
+
+    private GameVariant _gameVariant;
+
+    private void init() {
+        _gameVariant = this.createVariant();
+    }
+
+    public GameVariant getVariant() {
+        return _gameVariant;
+    }
+
+    private GameVariant createVariant() {
+        // We need to get those keys from config:
+        // pocket_card_size, board_card_size,
+        // card_ranks, card_colors, card_ranking
+        int pocketCardSize = (int) this.config.get("pocket_card_size");
+        int boardCardSize = (int) this.config.get("board_card_size");
+        String cardRanks = (String) this.config.get("card_ranks");
+        String cardColors = (String) this.config.get("card_colors");
+        List<String> cardRanking = (List<String>) this.config.get("card_ranking");
+
+        GameVariant variant = new GameVariant.Builder()
+                .boardCardSize(boardCardSize)
+                .pocketCardSize(pocketCardSize)
+                .cardRanks(cardRanks)
+                .cardColors(cardColors)
+                .build();
+
+        return variant;
     }
 
     /**
@@ -41,7 +74,7 @@ public class GameConfigLoader {
     private void parseEnums() {
         for (Map.Entry<String, Class<? extends Enum<?>>> entry : enumMapping.entrySet()) {
             String key = entry.getKey();
-            String rawValue = config.getProperty(key);
+            String rawValue = (String) config.get(key);
             if (rawValue != null) {
                 Enum<?> enumValue = parseEnum(entry.getValue(), rawValue);
                 if (enumValue != null) {
