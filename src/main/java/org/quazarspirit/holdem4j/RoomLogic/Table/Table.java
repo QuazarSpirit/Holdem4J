@@ -3,6 +3,7 @@ package org.quazarspirit.holdem4j.RoomLogic.Table;
 import org.json.JSONObject;
 import org.quazarspirit.Utils.Utils;
 import org.quazarspirit.Utils.PubSub.*;
+import org.quazarspirit.holdem4j.MqttService;
 import org.quazarspirit.holdem4j.CardPile.Board;
 import org.quazarspirit.holdem4j.CardPile.CardPileOverflowException;
 import org.quazarspirit.holdem4j.CardPile.ICardPile;
@@ -23,6 +24,7 @@ import org.quazarspirit.holdem4j.RoomLogic.PlayerSeatRegistry.EventEnum;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     public enum EventEnum implements IEventType {
@@ -38,22 +40,31 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     protected HashMap<IPlayer, Stack> playersStack = new HashMap<>();
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
-    final private Dealer _dealer;
+    // final private Dealer _dealer;
     final private BettingRound _bettingRound = new BettingRound();
     final private Board _board;
     final private Pot _pot;
     final private Game _game;
 
-    final private Publisher _publisher = new Publisher(this);
+    final private IPublisher _publisher;
+
+    private UUID uuid = UUID.randomUUID();
 
     public Table(Game game) {
         _game = game;
         _maxPlayerCount = _game.getMaxSeatsCount();
         _pot = new Pot(_game.getUnit());
         _playerSeatRegistry = new PlayerSeatRegistry(_game);
+        _publisher = new MqttService(game.getBrokerUrl(), "Table", "/table/" + uuid.toString());
         this.addSubscriber(_playerSeatRegistry);
         this.addSubscriber(_bettingRound);
-        _dealer = new Dealer(this);
+        // _dealer = new Dealer(this);
+
+        JSONObject obj = new JSONObject();
+        obj.put("message", "New table created");
+        obj.put("table_id", uuid.toString());
+        _publisher.publish(obj);
+
         _board = new Board(game.getVariant().getBoardCardSize());
         /*
          * _positionHandler = new PositionHandler();
@@ -63,6 +74,10 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     public void run() {
         System.out.println(Thread.currentThread().getName());
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     // TODO: Test with multiple complete rounds
@@ -199,31 +214,36 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
     public boolean addPlayer(IPlayer player) {
         // Test if player is not already connected to table
         // or that the table is currently opened
-        if (_playerSeatRegistry._containsPlayer(player) || !isOpened) {
+        if (!isOpened) {
+            System.out.println("Table is closed");
             return false;
         }
 
         // Test if futurePlayer is superior to max allowed player count
-        int futurePlayerCount = players.size() + 1;
+        int futurePlayerCount = _playerSeatRegistry.getCurrentPlayerCount() + 1;
         if (futurePlayerCount >= _maxPlayerCount) {
             isOpened = false;
             if (futurePlayerCount > _maxPlayerCount) {
+                System.out.println("No space avaible for a new player");
                 return false;
             }
         }
 
-        if (_bettingRound.getPhase() == BettingRound.PhaseEnum.STASIS) {
-            _playerSeatRegistry.add(player);
-
-            _dealer.addSubscriber(player);
-            player.addSubscriber(_dealer);
-        } else {
-            // _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player,
-            // PLAYER_INTENT.JOIN));
-            // Todo: implement wait
+        if (!_playerSeatRegistry.add(player)) {
             return false;
-
         }
+        // if (_bettingRound.getPhase() == BettingRound.PhaseEnum.STASIS) {
+        // _playerSeatRegistry.add(player);
+
+        // // _dealer.addSubscriber(player);
+        // // player.addSubscriber(_dealer);
+        // } else {
+        // // _waitingPlayers.add(new ImmutableKV<IPlayer, PLAYER_INTENT>(player,
+        // // PLAYER_INTENT.JOIN));
+        // // Todo: implement wait
+        // return false;
+
+        // }
 
         playersPocketCard.put(player, new PocketCards(_game.getVariant().getPocketCardSize()));
 
@@ -239,7 +259,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             isOpened = true;
         }
 
-        if (!_playerSeatRegistry._containsPlayer(player)) {
+        if (!_playerSeatRegistry.hasPlayer(player)) {
             return;
         }
 

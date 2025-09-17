@@ -148,7 +148,7 @@ public class LobbyServer implements ILobby {
     @Override
     public void addGame(Game game) {
         System.out.println("Adding game to lobby");
-        _games.put(UUID.randomUUID(), game);
+        _games.put(game.getUuid(), game);
         _tables.put(game, null);
     }
 
@@ -156,6 +156,7 @@ public class LobbyServer implements ILobby {
     public void joinGame(IPlayer player, Game game) {
         // There is no tables registered for a game by default
         if (_tables.get(game) == null) {
+            System.out.println("Game has no table yet, creating new table");
             _tables.put(game, new ArrayList<ITable>());
             createNewTableForGame(game);
         }
@@ -169,12 +170,14 @@ public class LobbyServer implements ILobby {
         boolean playerJoined = false;
         for (ITable table : tables) {
             if (table.addPlayer(player)) {
+                System.out.println("Player added to table: " + table.getUuid().toString());
                 playerJoined = true;
                 break;
             }
         }
 
         if (!playerJoined) {
+            System.out.println("No table available, creating a new table");
             createNewTableForGame(game).addPlayer(player);
         }
     }

@@ -10,6 +10,7 @@ import org.quazarspirit.holdem4j.RoomLogic.Dealer;
 import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public interface ITable {
     public BettingRound getRound();
@@ -37,4 +38,6 @@ public interface ITable {
     public Pot getPot();
 
     public boolean addPlayer(IPlayer player);
+
+    public UUID getUuid();
 }

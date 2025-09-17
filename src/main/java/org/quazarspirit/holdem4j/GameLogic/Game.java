@@ -1,6 +1,7 @@
 package org.quazarspirit.holdem4j.GameLogic;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.quazarspirit.Utils.GameConfigLoader;
 import org.quazarspirit.holdem4j.GameLogic.ChipPile.Chip;
@@ -10,13 +11,6 @@ import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
  * Structured object for better handling of rules
  */
 public class Game {
-    // Not the best place to put it, TODO: Move it in config file / cli args
-    protected String brokerUrl = "tcp://localhost:1883";
-
-    public String getBrokerUrl() {
-        return brokerUrl;
-    }
-
     public enum RankVariantEnum {
         HIGH, HIGH_LOW, LOW
     }
@@ -68,6 +62,11 @@ public class Game {
     private int _minStackSize;
     private Chip _unit;
 
+    private UUID uuid = UUID.randomUUID();
+
+    // Not the best place to put it, TODO: Move it in config file / cli args
+    protected String brokerUrl = "tcp://localhost:1883";
+
     public Game(GameConfigLoader configLoader) {
         this._variant = configLoader.getVariant();
 
@@ -81,6 +80,14 @@ public class Game {
     private void setStackSize(int maxStackSize) {
         _maxStackSize = maxStackSize;
         _minStackSize = _maxStackSize / 5;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getBrokerUrl() {
+        return brokerUrl;
     }
 
     public GameVariant getVariant() {

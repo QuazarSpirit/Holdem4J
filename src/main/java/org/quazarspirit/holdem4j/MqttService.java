@@ -29,7 +29,6 @@ public class MqttService extends Publisher {
 
         MqttMessage message = new MqttMessage(jsonObject.toString().getBytes());
         try {
-            
             _client.publish(_topic, message);
         } catch (Exception e) {
             // TODO: handle exception

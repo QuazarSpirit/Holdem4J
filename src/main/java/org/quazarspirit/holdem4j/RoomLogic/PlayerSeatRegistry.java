@@ -55,17 +55,17 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
         return new HashMap<>(playersSeat);
     }
 
-    /**
-     * TODO: Migrate to events
-     */
     public boolean add(IPlayer player) {
-        if (_containsPlayer(player)) {
+        if (hasPlayer(player)) {
+            System.out.println("Player is already registered");
             return false;
         }
 
         int playerSeatIndex = getFirstEmptySeat();
+        System.out.println("Player seat: " + playerSeatIndex);
 
         if (playerSeatIndex == -1) {
+            System.out.println("No seat available");
             return false;
         }
 
@@ -77,7 +77,7 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
      * TODO: Migrate to events
      */
     public boolean remove(IPlayer player) {
-        if (!_containsPlayer(player)) {
+        if (!hasPlayer(player)) {
             return false;
         }
 
@@ -197,8 +197,12 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
         return getSeatFromPlayer(playerToCheck).getSeatNumber();
     }
 
-    public boolean _containsPlayer(IPlayer playerToCheck) {
+    public boolean hasPlayer(IPlayer playerToCheck) {
         return getPlayerSeatNumber(playerToCheck) != -1;
+    }
+
+    public int getCurrentPlayerCount() {
+        return getRealPlayers().size();
     }
 
     public String asString() {
