@@ -10,6 +10,13 @@ import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
  * Structured object for better handling of rules
  */
 public class Game {
+    // Not the best place to put it, TODO: Move it in config file / cli args
+    protected String brokerUrl = "tcp://localhost:1883";
+
+    public String getBrokerUrl() {
+        return brokerUrl;
+    }
+
     public enum RankVariantEnum {
         HIGH, HIGH_LOW, LOW
     }

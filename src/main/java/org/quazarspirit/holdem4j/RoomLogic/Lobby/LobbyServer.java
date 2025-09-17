@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.json.JSONObject;
+import org.quazarspirit.Utils.PubSub.IPublisher;
+import org.quazarspirit.holdem4j.MqttService;
 import org.quazarspirit.holdem4j.GameLogic.Game;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.RealPlayer;
@@ -21,7 +23,15 @@ public class LobbyServer implements ILobby {
 
     private HashMap<UUID, IPlayer> _players = new HashMap<UUID, IPlayer>();
 
-    public LobbyServer(int port) {
+    private String _brokerUrl = "tcp://localhost:1883";
+    private IPublisher _publisher;
+
+    public LobbyServer(int port, String brokerUrl) {
+        _brokerUrl = brokerUrl;
+
+        // Create mqtt lobby topic
+        _publisher = new MqttService(_brokerUrl, "Lobby", "/lobby");
+
         main(port);
     }
 
@@ -117,7 +127,13 @@ public class LobbyServer implements ILobby {
                 return;
             }
 
+            JSONObject statusMessage = new JSONObject();
+            statusMessage.put("message", "Player joined game");
+            statusMessage.put("player", player);
+            statusMessage.put("game", game);
+
             ctx.result("Joined game : " + game);
+            _publisher.publish(statusMessage);
             joinGame(player, game);
             // TODO: Make player join through websocket or smth
         } catch (ClassCastException e) {
