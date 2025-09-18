@@ -148,7 +148,7 @@ public class Lobby implements ILobby, ISubscriber {
 
             for (Table table : set.getValue()) {
                 result.append("\n -- Player count: ").append(table.getPlayerCount()).append(" ");
-                for (IPlayer p : table.players.values()) {
+                for (IPlayer p : table.getPlayers()) {
                     result.append(p.getUsername()).append(" - ");
                 }
             }
@@ -162,7 +162,7 @@ public class Lobby implements ILobby, ISubscriber {
      */
     @Override
     public void update(Event event) {
-        IEventType eventType = (IEventType) event.data.get("type");
+        IEventType eventType = (IEventType) event.getType();
         if (eventType == PlayerIntentEnum.JOIN) {
             joinGame((IPlayer) event.source, (Game) event.data.get("game"));
         }

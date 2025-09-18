@@ -239,6 +239,14 @@ public class PlayerSeatRegistry extends Publisher implements ISubscriber {
         return realPlayers;
     }
 
+    public ArrayList<PositionEnum> getUsedPositions() {
+        return _positionHandler.getUsed();
+    }
+
+    public ArrayList<PositionEnum> getPlayingPositions() {
+        return _positionHandler.getPlaying();
+    }
+
     public int size() {
         return getRealPlayers().size();
     }

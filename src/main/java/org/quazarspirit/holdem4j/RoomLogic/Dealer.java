@@ -3,11 +3,10 @@ package org.quazarspirit.holdem4j.RoomLogic;
 import org.json.JSONObject;
 import org.quazarspirit.Utils.ImmutableKV;
 import org.quazarspirit.Utils.Utils;
-import org.quazarspirit.Utils.MessageQueue.Producer;
 import org.quazarspirit.Utils.PubSub.*;
 import org.quazarspirit.holdem4j.Card;
+import org.quazarspirit.holdem4j.MqttService;
 import org.quazarspirit.holdem4j.CardPile.Board;
-import org.quazarspirit.holdem4j.CardPile.CardPileOverflowException;
 import org.quazarspirit.holdem4j.CardPile.Deck;
 import org.quazarspirit.holdem4j.CardPile.ICardPile;
 import org.quazarspirit.holdem4j.CardPile.PocketCards;
@@ -20,8 +19,6 @@ import org.quazarspirit.holdem4j.PlayerLogic.PlayerActionEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.RoomLogic.Table.Table;
-
-import java.net.URI;
 import java.util.*;
 
 /**
@@ -32,30 +29,32 @@ import java.util.*;
  * Handle rules in general.<br>
  * Computes pot size.
  */
-public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
-    private final URI MQ_Endpoint = URI.create("http://localhost:4000/message/add");
+public class Dealer implements ISubscriber, IPublisher {
     private Deck _deck;
     private final Table _table;
 
-    private final Producer _producer = new Producer();
-    private final Publisher _publisher = new Publisher(this);
+    private final IPublisher _publisher;
     private BettingRound.PhaseEnum _roundPhase;
     private ArrayList<PositionEnum> _currPlayingPos = new ArrayList<>();
 
-    private Deck.Builder _deckBuilder;
+    private GameVariant _variant;
 
     private final ArrayList<ImmutableKV<PlayerActionEnum, Bet>> _previousPlayerActions = new ArrayList<>();
 
-    public Dealer(Table table) throws CardPileOverflowException {
+    public Dealer(Table table) {
         _table = table;
         _table.addSubscriber(this);
 
-        GameVariant variant = table.getGame().getVariant();
+        _variant = table.getGame().getVariant();
+        _deck = createNewDeck();
 
-        Deck.Builder _deckBuilder = new Deck.Builder()
-                .CardColorRange(variant.getCardColors())
-                .CardRankRange(variant.getCardRanks());
-        _deck = new Deck(_deckBuilder);
+        _publisher = new MqttService(table.getGame().getBrokerUrl(), "Dealer", "/table/" + table.getUuid() + "/dealer");
+    }
+
+    private Deck createNewDeck() {
+        return new Deck.Builder()
+                .CardColorRange(_variant.getCardColors())
+                .CardRankRange(_variant.getCardRanks()).build();
     }
 
     public boolean canStart() {
@@ -68,14 +67,16 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
             return;
         }
         _roundPhase = _table.getRound().getPhase();
-        // Utils.Log(_roundPhase.toString());
+        Utils.Log(_roundPhase.toString());
 
         switch (_roundPhase) {
             case STASIS -> {
+                _table.getRound().getPhase().getNext();
+
                 return;
             }
             case PRE_FLOP -> {
-                _deck = new Deck(_deckBuilder);
+                _deck = createNewDeck();
                 if (!Utils.IsTesting()) {
                     _deck = _deck.shuffle();
                     Utils.Log("New deck: " + _deck.asString());
@@ -93,11 +94,12 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
         _currPlayingPos.clear();
         _previousPlayerActions.clear();
 
-        _currPlayingPos = _table.getPlayingPositions();
-
         // Send query action event to first player
         if (!Utils.IsTesting()) {
-            sendQueryActionEvent(_currPlayingPos.get(0), _previousPlayerActions);
+            // Technically in Seven Card Stud it's not guaranteed that the UTG is the first
+            // to play
+            Utils.Log("Ask UTG to play");
+            sendQueryActionEvent(PositionEnum.UTG, _previousPlayerActions);
         }
 
         /*
@@ -235,7 +237,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
         Utils.Log("Playing positions: " + playingPositions);
 
         for (PositionEnum positionName : playingPositions) {
-            pocketCardsList.put(positionName, new PocketCards());
+            pocketCardsList.put(positionName, new PocketCards(_variant.getPocketCardSize()));
         }
 
         for (int j = 0; j < 2; j += 1) {
@@ -272,7 +274,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
      * @param drawCount Number of card to be added to board (usually 1 or 3)
      */
     public void draw(int drawCount) {
-        Board tmpBoard = new Board();
+        Board tmpBoard = new Board(_variant.getBoardCardSize());
         drawWithContext(drawCount, _deck, tmpBoard);
         // TODO: Send EVENT to TABLE
         _table.getBoard().pushCard(tmpBoard);
@@ -325,7 +327,7 @@ public class Dealer /* extends Thread */ implements ISubscriber, IPublisher {
      */
     @Override
     public void update(Event event) {
-        IEventType eventType = (IEventType) event.data.get("type");
+        IEventType eventType = (IEventType) event.getType();
 
         if (eventType == PlayerIntentEnum.JOIN) {
             if (canStart()) {

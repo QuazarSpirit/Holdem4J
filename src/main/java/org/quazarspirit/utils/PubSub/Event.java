@@ -10,7 +10,10 @@ public class Event {
     Event(IPublisher sourceArg, JSONObject dataArg) {
         source = sourceArg;
         data = dataArg;
-        _type = dataArg.get("type");
+
+        if (dataArg.has("type")) {
+            _type = dataArg.get("type");
+        }
     }
 
     Event(IPublisher sourceArg, JSONObject dataArg, IEventType typeArg) {

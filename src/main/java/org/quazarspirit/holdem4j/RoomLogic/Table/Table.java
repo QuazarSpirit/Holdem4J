@@ -1,11 +1,11 @@
 package org.quazarspirit.holdem4j.RoomLogic.Table;
 
 import org.json.JSONObject;
+import org.quazarspirit.Utils.ImmutableKV;
 import org.quazarspirit.Utils.Utils;
 import org.quazarspirit.Utils.PubSub.*;
 import org.quazarspirit.holdem4j.MqttService;
 import org.quazarspirit.holdem4j.CardPile.Board;
-import org.quazarspirit.holdem4j.CardPile.CardPileOverflowException;
 import org.quazarspirit.holdem4j.CardPile.ICardPile;
 import org.quazarspirit.holdem4j.CardPile.PocketCards;
 import org.quazarspirit.holdem4j.GameLogic.BettingRound;
@@ -15,15 +15,14 @@ import org.quazarspirit.holdem4j.GameLogic.ChipPile.Stack;
 import org.quazarspirit.holdem4j.PlayerLogic.PlayerIntentEnum;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.PlayerLogic.Player.NullPlayer;
+import org.quazarspirit.holdem4j.PlayerLogic.PlayerSeat.IPlayerSeat;
 import org.quazarspirit.holdem4j.RoomLogic.Dealer;
 import org.quazarspirit.holdem4j.RoomLogic.DealerIntentEnum;
 import org.quazarspirit.holdem4j.RoomLogic.PlayerSeatRegistry;
 import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
-import org.quazarspirit.holdem4j.RoomLogic.PlayerSeatRegistry.EventEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class Table extends Thread implements ITable, ISubscriber, IPublisher {
@@ -40,7 +39,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     protected HashMap<IPlayer, Stack> playersStack = new HashMap<>();
     protected HashMap<IPlayer, PocketCards> playersPocketCard = new HashMap<>();
-    // final private Dealer _dealer;
+    final private Dealer _dealer;
     final private BettingRound _bettingRound = new BettingRound();
     final private Board _board;
     final private Pot _pot;
@@ -58,7 +57,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         _publisher = new MqttService(game.getBrokerUrl(), "Table", "/table/" + uuid.toString());
         this.addSubscriber(_playerSeatRegistry);
         this.addSubscriber(_bettingRound);
-        // _dealer = new Dealer(this);
+        _dealer = new Dealer(this);
 
         JSONObject obj = new JSONObject();
         obj.put("message", "New table created");
@@ -193,25 +192,16 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         }
     }
 
-    /**
-     * @Deprecated Use events instead
-     * @return
-     */
-    @Deprecated
     public ArrayList<PositionEnum> getUsedPositions() {
-        return _playerSeatRegistry._positionHandler.getUsed();
+        return _playerSeatRegistry.getUsedPositions();
     }
 
-    /**
-     * @Deprecated Use events instead
-     * @return
-     */
-    @Deprecated
     public ArrayList<PositionEnum> getPlayingPositions() {
-        return _playerSeatRegistry._positionHandler.getPlaying();
+        return _playerSeatRegistry.getPlayingPositions();
     }
 
     public boolean addPlayer(IPlayer player) {
+        Utils.Log("Table add player");
         // Test if player is not already connected to table
         // or that the table is currently opened
         if (!isOpened) {
@@ -246,12 +236,24 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         // }
 
         playersPocketCard.put(player, new PocketCards(_game.getVariant().getPocketCardSize()));
+        sendPlayerEvent(player, PlayerIntentEnum.JOIN, futurePlayerCount);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", PlayerIntentEnum.JOIN);
-        jsonObject.put("player", player);
-        publish(jsonObject);
+        // Future count is now current count because player is successfully added to
+        // table
+        if (futurePlayerCount > 1) {
+            Utils.Log("Ask dealer to start game");
+            nextBettingRoundPhase();
+            _dealer.playRoundPhase();
+        }
         return true;
+    }
+
+    public void sendPlayerEvent(IPlayer player, PlayerIntentEnum intent, int currentPlayerCount) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", intent);
+        jsonObject.put("player", player);
+        jsonObject.put("current_player_count", currentPlayerCount);
+        publish(jsonObject);
     }
 
     public void removePlayer(IPlayer player) {
@@ -277,10 +279,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
             // PLAYER_INTENT.LEAVE));
         }
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", PlayerIntentEnum.LEAVE);
-        jsonObject.put("player", player);
-        publish(jsonObject);
+        sendPlayerEvent(player, PlayerIntentEnum.LEAVE, _playerSeatRegistry.getCurrentPlayerCount());
     }
 
     public int getPlayerCount() {
@@ -291,10 +290,13 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
         return _maxPlayerCount;
     }
 
-    @Deprecated
     public IPlayer getPlayerFromPosition(PositionEnum positionName) {
-        if (players.containsKey(positionName)) {
-            return players.get(positionName);
+        var players = _playerSeatRegistry.getRealPlayers();
+
+        for (ImmutableKV<IPlayer, IPlayerSeat> e : players) {
+            if (e.getValue().getPosition().equals(positionName)) {
+                return e.getKey();
+            }
         }
 
         return NullPlayer.GetSingleton();
@@ -317,15 +319,26 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
 
     @Deprecated
     public PositionEnum getPositionFromPlayer(IPlayer concretePlayer) {
-        for (Map.Entry<PositionEnum, IPlayer> e : players.entrySet()) {
-            if (e.getValue().equals(concretePlayer)) {
-                return e.getKey();
+        var players = _playerSeatRegistry.getRealPlayers();
+        for (ImmutableKV<IPlayer, IPlayerSeat> e : players) {
+            if (e.getKey().equals(concretePlayer)) {
+                return e.getValue().getPosition();
             }
         }
 
         return PositionEnum.NONE;
     }
 
+    public ArrayList<IPlayer> getPlayers() {
+        var players = _playerSeatRegistry.getRealPlayers();
+
+        ArrayList<IPlayer> playersWithoutPosition = new ArrayList<>();
+        for (ImmutableKV<IPlayer, IPlayerSeat> e : players) {
+            playersWithoutPosition.add(e.getKey());
+        }
+
+        return playersWithoutPosition;
+    }
     /*
      * public IPlayerSeat getSeatFromPlayer(IPlayer player) {
      * if (_playerSeats.containsKey(player)) {
@@ -381,7 +394,7 @@ public class Table extends Thread implements ITable, ISubscriber, IPublisher {
      */
     @Override
     public void update(Event event) {
-        IEventType eventType = (IEventType) event.data.get("type");
+        IEventType eventType = (IEventType) event.getType();
         if (eventType == DealerIntentEnum.QUERY_ACTION) {
             try {
                 wait(2000);

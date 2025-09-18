@@ -149,5 +149,9 @@ public class Deck extends CardPile {
             _cardColorRange = cardColorRange;
             return this;
         }
+
+        public Deck build() {
+            return new Deck(this);
+        }
     }
 }

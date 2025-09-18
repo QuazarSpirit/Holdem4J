@@ -57,30 +57,6 @@ public class LobbyServer implements ILobby {
         app.post("/join_game", ctx -> {
             joinGameFromRequest(ctx);
         });
-
-        // Not working TODO: Fix
-        // app.ws("/ws/join_game/{player_uuid}/{game_uuid}", ws -> {
-        // // ws.onConnect(ctx -> {
-        // // System.out.println("Essai de connection");
-        // // String playerUuid = (String) ctx.queryParam("player_uuid");
-        // // IPlayer player = fetchPlayer(UUID.fromString(playerUuid));
-
-        // // String gameUuid = (String) ctx.queryParam("game_uuid");
-        // // Game game = _games.get(UUID.fromString(gameUuid));
-        // // joinGame(player, game);
-        // // });
-
-        // ws.onMessage(ctx -> {
-        // });
-
-        // ws.onClose(ctx -> {
-        // // Disconnect from table
-        // });
-
-        // ws.onError(ctx -> {
-        // System.out.println("Erreur WS : " + ctx.error());
-        // });
-        // });
     }
 
     /**

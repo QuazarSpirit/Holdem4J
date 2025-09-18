@@ -2,7 +2,6 @@ package org.quazarspirit.holdem4j.PlayerLogic.PlayerSeat;
 
 import org.quazarspirit.holdem4j.PlayerLogic.Player.IPlayer;
 import org.quazarspirit.holdem4j.RoomLogic.PositionEnum;
-import org.quazarspirit.holdem4j.RoomLogic.PositionHandler;
 
 /*
  * Class that simplifies player position handling

@@ -1,5 +1,6 @@
 package org.quazarspirit.holdem4j;
 
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -24,14 +25,22 @@ public class MqttService extends Publisher {
         }
     }
 
-    @Override
-    public void publish(JSONObject jsonObject) {
-
+    public void publish(String topic, JSONObject jsonObject) {
         MqttMessage message = new MqttMessage(jsonObject.toString().getBytes());
         try {
-            _client.publish(_topic, message);
+            _client.publish(topic, message);
         } catch (Exception e) {
             // TODO: handle exception
         }
+    }
+
+    @Override
+    public void publish(JSONObject jsonObject) {
+        super.publish(jsonObject);
+        publish(_topic, jsonObject);
+    }
+
+    public void setMqttCallback(MqttCallback callback) {
+        _client.setCallback(callback);
     }
 }
