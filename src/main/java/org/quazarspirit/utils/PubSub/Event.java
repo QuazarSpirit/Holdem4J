@@ -7,7 +7,7 @@ public class Event {
     final public IPublisher source;
     protected Object _type;
 
-    Event(IPublisher sourceArg, JSONObject dataArg) {
+    public Event(IPublisher sourceArg, JSONObject dataArg) {
         source = sourceArg;
         data = dataArg;
 
@@ -16,7 +16,7 @@ public class Event {
         }
     }
 
-    Event(IPublisher sourceArg, JSONObject dataArg, IEventType typeArg) {
+    public Event(IPublisher sourceArg, JSONObject dataArg, IEventType typeArg) {
         this(sourceArg, dataArg);
         _type = typeArg;
     }

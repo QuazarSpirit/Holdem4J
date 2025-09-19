@@ -33,7 +33,7 @@ public class Dealer implements ISubscriber, IPublisher {
     private Deck _deck;
     private final Table _table;
 
-    private final IPublisher _publisher;
+    private final MqttService _publisher;
     private BettingRound.PhaseEnum _roundPhase;
     private ArrayList<PositionEnum> _currPlayingPos = new ArrayList<>();
 
@@ -49,6 +49,7 @@ public class Dealer implements ISubscriber, IPublisher {
         _deck = createNewDeck();
 
         _publisher = new MqttService(table.getGame().getBrokerUrl(), "Dealer", "/table/" + table.getUuid() + "/dealer");
+        _publisher.setOnMessage(this::update);
     }
 
     private Deck createNewDeck() {
